@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>クリック心理ラボ — なぜ、あなたは押してしまうのか</title>
+<meta name="description" content="偽のランディングページを検体として観察し、自分がどの心理に反応したのかを確かめる練習場です。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ============ タイトル ============ -->
+  <section class="screen screen--title" id="screen-title">
+    <p class="title__over">クリック心理ラボ</p>
+    <h1 class="title__h">なぜ、あなたは<br>押してしまうのか</h1>
+    <p class="title__lead">
+      12枚のページを検査台に載せます。ほとんどは、あなたを急がせたり、
+      恥ずかしがらせたり、見落とさせたりするために作られたものです。
+      ただし2枚だけ、まったく正当なページが混ざっています。
+      すべてを疑う人は、そこで点を落とします。
+    </p>
+    <ul class="title__facts">
+      <li><b>12</b><span>検体</span></li>
+      <li><b>2</b><span>正当な事例</span></li>
+      <li><b>約8分</b><span>所要時間</span></li>
+    </ul>
+    <button class="btn btn--go" id="btn-start">検査を始める</button>
+    <p class="title__fine">登場する企業・サービス・商品はすべて架空のものです。</p>
+  </section>
+
+  <!-- ============ 検査 ============ -->
+  <section class="screen screen--stage" id="screen-stage" hidden>
+
+    <header class="bar">
+      <div class="bar__track" id="progress"></div>
+      <div class="bar__meta">
+        <span id="bar-count">検体 1 / 12</span>
+        <span id="bar-score">0 点</span>
+      </div>
+    </header>
+
+    <h2 class="stage__h"><span class="stage__no" id="stage-no">01</span><span id="stage-title"></span></h2>
+
+    <!-- 検体 -->
+    <figure class="specimen" id="specimen">
+      <figcaption class="specimen__chrome">
+        <span class="specimen__dots"><i></i><i></i><i></i></span>
+        <span class="specimen__url" id="specimen-url"></span>
+      </figcaption>
+      <div class="specimen__view" id="mock"></div>
+    </figure>
+
+    <button class="btn btn--demo" id="btn-demo" hidden></button>
+    <p class="demo-result" id="demo-result" hidden></p>
+
+    <!-- 設問 -->
+    <div class="ask" id="ask">
+      <p class="ask__q" id="question"></p>
+      <div class="ask__choices" id="choices"></div>
+    </div>
+
+    <!-- 種明かし -->
+    <div class="reveal" id="reveal" hidden>
+      <p class="reveal__verdict" id="reveal-verdict"></p>
+      <p class="reveal__feedback" id="reveal-feedback"></p>
+
+      <dl class="reveal__defs">
+        <div><dt>手法の名前</dt><dd id="reveal-pattern"></dd></div>
+        <div><dt>働いている心理</dt><dd id="reveal-psych"></dd></div>
+      </dl>
+
+      <p class="reveal__body" id="reveal-explain"></p>
+
+      <div class="reveal__checks">
+        <p class="reveal__checksH">次に出会ったときの確かめ方</p>
+        <ul id="reveal-checks"></ul>
+      </div>
+
+      <button class="btn btn--go" id="btn-next">次の検体へ</button>
+    </div>
+  </section>
+
+  <!-- ============ 結果 ============ -->
+  <section class="screen screen--result" id="screen-result" hidden>
+    <p class="result__over">検査終了</p>
+    <div class="result__score"><b id="result-score">0</b><span>/ 120</span></div>
+    <p class="result__rank" id="result-rank"></p>
+    <p class="result__lead" id="result-lead"></p>
+
+    <div class="result__breakdown">
+      <p class="result__bh">分野ごとの結果</p>
+      <div id="result-cats"></div>
+    </div>
+
+    <div class="result__missed" id="result-missed"></div>
+
+    <button class="btn btn--go" id="btn-retry">もう一度検査する</button>
+  </section>
+
+</div>
+
+<script src="data/stages.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

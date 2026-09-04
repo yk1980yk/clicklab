@@ -1,0 +1,538 @@
+/* ===========================================================
+   クリック心理ラボ
+   シェル＝静かな検査台 / 検体＝実際のWebらしい派手さ
+   =========================================================== */
+
+:root{
+  --paper:#E6E8E2;
+  --paper-2:#F2F3EE;
+  --white:#FCFCFA;
+  --ink:#1C2027;
+  --ink-2:#5C6470;
+  --ink-3:#8A9199;
+  --line:#C3C8BC;
+  --line-2:#D9DDD3;
+  --signal:#BE2A1C;
+  --signal-bg:#FBEBE8;
+  --clear:#2B6A4D;
+  --clear-bg:#E8F1EA;
+  --amber:#9C6B0C;
+}
+
+*{box-sizing:border-box}
+
+html{-webkit-text-size-adjust:100%}
+
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Zen Kaku Gothic New",-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+  font-size:16px;
+  line-height:1.85;
+  font-feature-settings:"palt" 1;
+}
+
+.shell{
+  max-width:720px;
+  margin:0 auto;
+  padding:40px 20px 96px;
+}
+
+@media(max-width:520px){
+  .shell{padding:24px 14px 72px}
+  body{font-size:15px}
+}
+
+.screen[hidden]{display:none}
+
+/* ---------- ボタン ---------- */
+.btn{
+  font:inherit;
+  font-weight:700;
+  border:none;
+  cursor:pointer;
+  border-radius:2px;
+}
+.btn--go{
+  display:block;
+  width:100%;
+  padding:16px;
+  background:var(--ink);
+  color:var(--paper-2);
+  font-size:1rem;
+  letter-spacing:.04em;
+  transition:background .15s;
+}
+.btn--go:hover{background:#2C323C}
+.btn:focus-visible{outline:2px solid var(--signal);outline-offset:3px}
+
+/* ===========================================================
+   タイトル
+   =========================================================== */
+.screen--title{padding-top:24px}
+
+.title__over{
+  margin:0 0 28px;
+  font-size:.8rem;
+  font-weight:700;
+  letter-spacing:.22em;
+  color:var(--ink-2);
+}
+.title__h{
+  margin:0 0 28px;
+  font-size:clamp(2.1rem,8vw,3.1rem);
+  font-weight:900;
+  line-height:1.28;
+  letter-spacing:-.01em;
+}
+.title__lead{
+  margin:0 0 36px;
+  max-width:34em;
+  color:#333A44;
+}
+.title__facts{
+  display:flex;
+  gap:36px;
+  margin:0 0 40px;
+  padding:20px 0;
+  list-style:none;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+}
+.title__facts li{display:flex;flex-direction:column;line-height:1.3}
+.title__facts b{font-size:1.7rem;font-weight:900}
+.title__facts span{font-size:.78rem;color:var(--ink-2);margin-top:4px}
+.title__fine{
+  margin:18px 0 0;
+  font-size:.76rem;
+  color:var(--ink-3);
+  text-align:center;
+}
+
+/* ===========================================================
+   検査バー
+   =========================================================== */
+.bar{margin-bottom:34px}
+.bar__track{display:flex;gap:4px}
+.bar__track i{
+  flex:1;
+  height:5px;
+  background:var(--line-2);
+  border-radius:1px;
+}
+.bar__track i.is-now{background:var(--ink)}
+.bar__track i.is-hit{background:var(--clear)}
+.bar__track i.is-part{background:var(--amber)}
+.bar__track i.is-miss{background:var(--signal)}
+
+.bar__meta{
+  display:flex;
+  justify-content:space-between;
+  margin-top:9px;
+  font-size:.76rem;
+  color:var(--ink-2);
+  letter-spacing:.06em;
+}
+
+/* ===========================================================
+   見出し
+   =========================================================== */
+.stage__h{
+  display:flex;
+  align-items:baseline;
+  gap:14px;
+  margin:0 0 22px;
+  font-size:1.42rem;
+  font-weight:700;
+  line-height:1.45;
+}
+.stage__no{
+  font-family:"Roboto Mono",monospace;
+  font-size:.9rem;
+  font-weight:700;
+  color:var(--ink-3);
+  flex:none;
+}
+
+/* ===========================================================
+   検体フレーム
+   =========================================================== */
+.specimen{
+  margin:0 0 22px;
+  border:1px solid var(--line);
+  background:var(--white);
+  box-shadow:0 1px 0 var(--line-2);
+}
+.specimen__chrome{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:9px 12px;
+  background:var(--paper-2);
+  border-bottom:1px solid var(--line-2);
+}
+.specimen__dots{display:flex;gap:5px;flex:none}
+.specimen__dots i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.specimen__url{
+  font-family:"Roboto Mono",monospace;
+  font-size:.68rem;
+  color:var(--ink-3);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.specimen__view{
+  padding:22px;
+  font-size:.94rem;
+  line-height:1.7;
+}
+@media(max-width:520px){
+  .specimen__view{padding:15px}
+}
+
+/* ---------- 印（回答後に出る） ---------- */
+.specimen__view [data-trap]{position:relative}
+
+/* 印が付くと最上部のラベルがはみ出すため、上に逃げ場を作る */
+.specimen.is-marked .specimen__view{padding-top:38px}
+
+.specimen.is-marked [data-trap]{
+  outline:2px solid var(--signal);
+  outline-offset:3px;
+  border-radius:1px;
+  overflow:visible;   /* ラベルが切り取られないように */
+}
+.specimen.is-marked [data-trap="clear"]{outline-color:var(--clear)}
+
+.specimen.is-marked [data-trap]::after{
+  content:attr(data-label);
+  position:absolute;
+  right:-2px;
+  top:-7px;
+  transform:translateY(-100%);
+  z-index:5;
+  padding:2px 7px;
+  background:var(--signal);
+  color:#fff;
+  font-size:.66rem;
+  font-weight:700;
+  line-height:1.6;
+  letter-spacing:.02em;
+  white-space:nowrap;
+  border-radius:1px;
+  pointer-events:none;
+}
+.specimen.is-marked [data-trap="clear"]::after{background:var(--clear)}
+
+@media(max-width:520px){
+  .specimen.is-marked [data-trap]::after{
+    font-size:.6rem;
+    max-width:60vw;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+}
+
+/* ---------- 実演ボタン ---------- */
+.btn--demo{
+  width:100%;
+  padding:12px;
+  margin-bottom:14px;
+  background:transparent;
+  border:1px dashed var(--ink-2);
+  color:var(--ink);
+  font-size:.86rem;
+  font-weight:700;
+}
+.btn--demo:hover{background:var(--paper-2)}
+.demo-result{
+  margin:0 0 22px;
+  padding:14px 16px;
+  background:var(--paper-2);
+  border-left:3px solid var(--ink);
+  font-size:.88rem;
+}
+
+/* ===========================================================
+   設問
+   =========================================================== */
+.ask__q{
+  margin:32px 0 18px;
+  font-size:1.04rem;
+  font-weight:700;
+  line-height:1.75;
+}
+.ask__choices{display:flex;flex-direction:column;gap:9px}
+
+.choice{
+  display:flex;
+  gap:13px;
+  width:100%;
+  padding:15px 16px;
+  text-align:left;
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:2px;
+  font:inherit;
+  font-size:.93rem;
+  line-height:1.65;
+  color:var(--ink);
+  cursor:pointer;
+  transition:border-color .12s,background .12s;
+}
+.choice:hover:not(:disabled){border-color:var(--ink);background:var(--paper-2)}
+.choice:disabled{cursor:default;opacity:.55}
+.choice__k{
+  flex:none;
+  font-family:"Roboto Mono",monospace;
+  font-size:.78rem;
+  font-weight:700;
+  color:var(--ink-3);
+  padding-top:.18em;
+}
+.choice.is-picked{opacity:1;border-color:var(--ink);border-width:2px;background:var(--paper-2)}
+.choice.is-best{opacity:1;border-color:var(--clear);border-width:2px}
+.choice.is-best .choice__k{color:var(--clear)}
+
+/* ===========================================================
+   種明かし
+   =========================================================== */
+.reveal{
+  margin-top:34px;
+  padding-top:28px;
+  border-top:2px solid var(--ink);
+}
+.reveal__verdict{
+  margin:0 0 10px;
+  font-size:.78rem;
+  font-weight:700;
+  letter-spacing:.14em;
+  color:var(--signal);
+}
+.reveal__verdict.is-clear{color:var(--clear)}
+
+.reveal__feedback{
+  margin:0 0 26px;
+  font-size:1.02rem;
+  font-weight:500;
+  line-height:1.8;
+}
+
+.reveal__defs{margin:0 0 22px;padding:0}
+.reveal__defs>div{
+  display:grid;
+  grid-template-columns:8.5em 1fr;
+  gap:12px;
+  padding:11px 0;
+  border-bottom:1px solid var(--line-2);
+}
+.reveal__defs dt{
+  margin:0;
+  font-size:.78rem;
+  color:var(--ink-2);
+  padding-top:.28em;
+}
+.reveal__defs dd{margin:0;font-size:.93rem;font-weight:700;line-height:1.6}
+
+@media(max-width:520px){
+  .reveal__defs>div{grid-template-columns:1fr;gap:2px}
+}
+
+.reveal__body{
+  margin:0 0 26px;
+  font-size:.95rem;
+  color:#333A44;
+}
+
+.reveal__checks{
+  padding:18px 20px;
+  background:var(--paper-2);
+  border:1px solid var(--line-2);
+  margin-bottom:30px;
+}
+.reveal__checksH{
+  margin:0 0 10px;
+  font-size:.8rem;
+  font-weight:700;
+  color:var(--ink-2);
+}
+.reveal__checks ul{margin:0;padding-left:1.15em}
+.reveal__checks li{font-size:.9rem;margin-bottom:6px}
+.reveal__checks li::marker{color:var(--ink-3)}
+
+/* ===========================================================
+   結果
+   =========================================================== */
+.result__over{
+  margin:0 0 22px;
+  font-size:.8rem;
+  font-weight:700;
+  letter-spacing:.22em;
+  color:var(--ink-2);
+}
+.result__score{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+.result__score b{font-size:4.4rem;font-weight:900;line-height:1}
+.result__score span{font-size:1rem;color:var(--ink-2)}
+.result__rank{margin:0 0 18px;font-size:1.3rem;font-weight:700}
+.result__lead{margin:0 0 38px;color:#333A44}
+
+.result__bh{
+  margin:0 0 12px;
+  font-size:.8rem;
+  font-weight:700;
+  color:var(--ink-2);
+}
+.cat{
+  display:grid;
+  grid-template-columns:7.5em 1fr 3.2em;
+  align-items:center;
+  gap:12px;
+  padding:9px 0;
+  border-bottom:1px solid var(--line-2);
+  font-size:.86rem;
+}
+.cat__bar{height:6px;background:var(--line-2);border-radius:1px;overflow:hidden}
+.cat__bar i{display:block;height:100%;background:var(--ink)}
+.cat__bar.is-weak i{background:var(--signal)}
+.cat__val{text-align:right;font-family:"Roboto Mono",monospace;font-size:.78rem;color:var(--ink-2)}
+
+.result__missed{margin:34px 0 38px}
+.result__missed h3{
+  margin:0 0 12px;
+  font-size:.8rem;
+  font-weight:700;
+  color:var(--ink-2);
+}
+.miss{
+  padding:13px 15px;
+  margin-bottom:8px;
+  background:var(--signal-bg);
+  border-left:3px solid var(--signal);
+  font-size:.88rem;
+}
+.miss b{display:block;font-size:.93rem;margin-bottom:2px}
+
+/* ===========================================================
+   ここから下は「検体」の見た目
+   実際のWebに寄せて、あえて派手にしている
+   =========================================================== */
+
+.specimen__view button{font:inherit;cursor:pointer;border:none}
+
+/* ---- 1 セール ---- */
+.m-sale__banner{background:#D81E06;color:#fff;padding:14px 16px;border-radius:3px;font-weight:700;line-height:1.6}
+.m-sale__badge{display:inline-block;background:#FFE100;color:#B31905;font-size:.72rem;padding:1px 8px;border-radius:2px;margin-right:8px}
+.m-sale__price{display:block;margin-top:6px;font-size:.86rem;font-weight:400}
+.m-sale__price b{font-size:1.5rem;font-weight:900;color:#FFE100}
+.m-sale__timer{display:flex;align-items:center;justify-content:center;gap:14px;margin:16px 0;padding:14px;background:#FFF6E0;border:1px solid #F0D48A;border-radius:3px}
+.m-sale__timerLabel{font-size:.8rem;color:#8A6A12;font-weight:700}
+.m-sale__clock{font-family:"Roboto Mono",monospace;font-size:1.9rem;font-weight:700;color:#D81E06;letter-spacing:.02em}
+.m-sale__clock.is-hot{animation:pulse 1s steps(2,end) infinite}
+@keyframes pulse{50%{opacity:.35}}
+@media(prefers-reduced-motion:reduce){.m-sale__clock.is-hot{animation:none}}
+.m-sale__stock{font-size:.86rem;color:#D81E06;font-weight:700;margin-bottom:12px}
+.m-sale__stock b{font-size:1.1rem}
+.m-sale__viewers{display:block;color:#6A6A6A;font-weight:400;font-size:.78rem;margin-top:3px}
+.m-sale__cta{display:block;width:100%;padding:16px;background:#FF6A00;color:#fff;font-size:1rem;font-weight:900;border-radius:4px;box-shadow:0 3px 0 #C74F00}
+.m-sale__note{margin:10px 0 0;font-size:.68rem;color:#9A9A9A}
+
+/* ---- 2 無料体験 ---- */
+.m-trial{text-align:center}
+.m-trial__h{margin:0 0 4px;font-size:1.25rem;font-weight:900}
+.m-trial__lead{margin:0 0 22px;color:#666;font-size:.88rem}
+.m-trial__cta{display:block;width:100%;padding:22px;background:#1DB954;color:#fff;font-size:1.24rem;font-weight:900;border-radius:6px;box-shadow:0 3px 0 #148540}
+.m-trial__sub{margin:10px 0 18px;font-size:.78rem;color:#888}
+.m-trial__fine{margin:0;font-size:.6rem;line-height:1.6;color:#BFBFBF;text-align:left}
+
+/* ---- 3 価格 ---- */
+.m-price__hero{background:#0B4FA8;color:#fff;padding:12px 14px;border-radius:3px;font-size:1.02rem;font-weight:700}
+.m-price__hero b{font-size:1.6rem;font-weight:900}
+.m-price__step{margin:16px 0 8px;font-size:.76rem;color:#888;font-weight:700}
+.m-price__table{width:100%;border-collapse:collapse;font-size:.88rem}
+.m-price__table td{padding:9px 2px;border-bottom:1px solid #EAEAEA}
+.m-price__table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.m-price__total td{font-weight:900;font-size:1.05rem;border-bottom:none;border-top:2px solid #333;padding-top:12px}
+.m-price__cta{display:block;width:100%;margin-top:16px;padding:15px;background:#0B4FA8;color:#fff;font-size:.98rem;font-weight:700;border-radius:4px}
+
+/* ---- 4 カート ---- */
+.m-cart__item{display:flex;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid #EAEAEA;font-size:.92rem}
+.m-cart__opt{display:flex;gap:9px;align-items:flex-start;padding:12px 0;font-size:.86rem;color:#444;cursor:pointer}
+.m-cart__opt input{margin:.35em 0 0;flex:none;width:16px;height:16px;accent-color:#E8720C}
+.m-cart__sum{margin:14px 0 16px;padding-top:14px;border-top:2px solid #333;font-size:1.05rem;font-weight:900}
+.m-cart__sum b{color:#D81E06}
+.m-cart__sumNote{display:block;font-size:.62rem;font-weight:400;color:#BDBDBD}
+.m-cart__cta{display:block;width:100%;padding:16px;background:#E8720C;color:#fff;font-size:1.02rem;font-weight:900;border-radius:24px}
+
+/* ---- 5 プラン ---- */
+.m-plan{text-align:center}
+.m-plan__h{margin:0 0 20px;font-size:1.05rem;font-weight:700}
+.m-plan__paid{display:block;width:100%;padding:20px;background:#E01B24;color:#fff;font-size:1.2rem;font-weight:900;border-radius:8px;line-height:1.4;box-shadow:0 3px 0 #A5121A}
+.m-plan__paidSub{display:block;font-size:.72rem;font-weight:400;margin-top:3px;opacity:.9}
+.m-plan__row{margin-top:18px;text-align:right}
+.m-plan__ghost{font-size:.66rem;color:#DEDEDE;cursor:pointer}
+
+/* ---- 6 座席確保 ---- */
+.m-hold__seat{padding:12px 14px;background:#EFF5FA;border:1px solid #C5DAEA;border-radius:3px;font-size:.9rem}
+.m-hold__seat b{font-size:1.05rem}
+.m-hold__timer{display:flex;align-items:center;justify-content:center;gap:12px;margin:16px 0;font-size:.86rem;font-weight:700;color:#2B4A66}
+.m-hold__clock{font-family:"Roboto Mono",monospace;font-size:1.7rem;font-weight:700;color:#1A5C96}
+.m-hold__note{margin:0 0 16px;font-size:.76rem;color:#777;line-height:1.7}
+.m-hold__cta{display:block;width:100%;padding:15px;background:#1A5C96;color:#fff;font-size:.98rem;font-weight:700;border-radius:4px}
+
+/* ---- 7 罪悪感 ---- */
+.m-shame{background:#F0F0F0;padding:26px 14px;border-radius:3px}
+.m-shame__card{max-width:340px;margin:0 auto;background:#fff;padding:26px 22px;border-radius:6px;text-align:center;box-shadow:0 8px 26px rgba(0,0,0,.14)}
+.m-shame__h{margin:0 0 18px;font-size:1.3rem;font-weight:900;color:#C2185B}
+.m-shame__yes{display:block;width:100%;padding:15px;background:#C2185B;color:#fff;font-size:.98rem;font-weight:900;border-radius:4px}
+.m-shame__no{display:block;margin:14px 0 0;font-size:.72rem;color:#AFAFAF;text-decoration:underline;cursor:pointer}
+
+/* ---- 8 おとり ---- */
+.m-bait__title{font-size:1.02rem;font-weight:700;line-height:1.5}
+.m-bait__price{margin:10px 0 14px;color:#D81E06;font-weight:700;font-size:.86rem}
+.m-bait__price b{font-size:1.9rem;font-weight:900}
+.m-bait__price s{color:#A0A0A0;font-weight:400;margin-left:6px}
+.m-bait__img{height:96px;display:flex;align-items:center;justify-content:center;background:#F2F2F2;color:#B5B5B5;font-size:.76rem;border-radius:3px;margin-bottom:14px}
+.m-bait__spec p{margin:0 0 5px;font-size:.84rem;color:#555}
+.m-bait__hidden{font-size:.58rem !important;color:#CFCFCF !important;line-height:1.5}
+.m-bait__cta{display:block;width:100%;margin-top:14px;padding:15px;background:#FFB300;color:#3A2A00;font-size:1rem;font-weight:900;border-radius:24px}
+
+/* ---- 9 解約迷宮 ---- */
+.m-maze{border:1px solid #E0E0E0;border-radius:6px;overflow:hidden}
+.m-maze__bar{padding:8px 14px;background:#F7F7F7;border-bottom:1px solid #E8E8E8;font-size:.72rem;color:#999;font-family:"Roboto Mono",monospace}
+.m-maze__body{padding:26px 20px;min-height:112px}
+.m-maze__h{margin:0 0 8px;font-size:1.08rem;font-weight:900}
+.m-maze__t{margin:0;font-size:.86rem;color:#666}
+.m-maze__btns{display:flex;flex-direction:column;gap:8px;padding:0 20px 20px}
+.m-maze__stay{padding:16px;background:#0A66C2;color:#fff;font-size:1.02rem;font-weight:900;border-radius:4px}
+.m-maze__go{padding:9px;background:transparent;color:#C9C9C9;font-size:.72rem;text-decoration:underline}
+
+/* ---- 10 ホテル ---- */
+.m-stay__name{font-size:1.05rem;font-weight:700;margin-bottom:12px}
+.m-stay__room{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-top:1px solid #EAEAEA;border-bottom:1px solid #EAEAEA;font-size:.86rem;flex-wrap:wrap}
+.m-stay__left{color:#D9480F;font-weight:700;font-size:.8rem;flex:none}
+.m-stay__row{padding:12px 0;font-size:.92rem}
+.m-stay__row b{font-size:1.2rem;font-weight:900}
+.m-stay__cal{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.m-stay__cal span{padding:4px 9px;background:#F4F6F8;border:1px solid #E2E6EA;border-radius:2px;font-size:.72rem;color:#556}
+.m-stay__cta{display:block;width:100%;padding:15px;background:#D9480F;color:#fff;font-size:.98rem;font-weight:700;border-radius:4px}
+
+/* ---- 11 権限 ---- */
+.m-perm{background:#EDEDF2;padding:22px 14px;border-radius:3px}
+.m-perm__app{text-align:center;font-size:.8rem;color:#8A8A96;margin-bottom:16px}
+.m-perm__dialog{max-width:310px;margin:0 auto;background:#fff;border-radius:14px;padding:22px 20px 8px;box-shadow:0 10px 30px rgba(0,0,0,.16)}
+.m-perm__t{margin:0 0 18px;font-size:.88rem;text-align:center;line-height:1.7}
+.m-perm__btns{display:flex;border-top:1px solid #E5E5EA}
+.m-perm__deny,.m-perm__allow{flex:1;text-align:center;padding:12px 0;font-size:.9rem;cursor:pointer}
+.m-perm__deny{color:#B0B0B8}
+.m-perm__allow{color:#0A84FF;font-weight:700;border-left:1px solid #E5E5EA}
+
+/* ---- 12 社会的証明 ---- */
+.m-proof__badges{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.m-proof__badges span{padding:5px 11px;background:#F7D6A0;color:#7A4A05;border-radius:14px;font-size:.74rem;font-weight:700}
+.m-proof__name{font-size:1.08rem;font-weight:700}
+.m-proof__stars{color:#F5A623;font-size:.88rem;font-weight:700;margin:4px 0 14px}
+.m-proof__reviews{border-top:1px solid #EEE}
+.m-proof__reviews p{display:flex;justify-content:space-between;gap:12px;margin:0;padding:9px 0;border-bottom:1px solid #F2F2F2;font-size:.8rem;color:#555}
+.m-proof__reviews span{flex:none;color:#BDBDBD;font-size:.68rem;font-family:"Roboto Mono",monospace}
+.m-proof__cta{display:block;width:100%;margin-top:16px;padding:15px;background:#E0407A;color:#fff;font-size:1rem;font-weight:900;border-radius:24px}
