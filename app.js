@@ -1,88 +1,122 @@
 /* ===========================================================
    クリック心理ラボ — 進行
+   検査モード（見破る） / 設計モード（作る）の2本立て
    =========================================================== */
 (function () {
   'use strict';
 
   var S = window.STAGES;
-  var MAX = 10;                    // 1検体あたりの満点
-  var TOTAL = S.length * MAX;
+  var C = window.CASES;
+  var MAX = 10;
 
-  var state = { i: 0, results: [], cleanup: null };
+  /* ---------- 言語 ---------- */
+  var LANG = (function () {
+    try { var v = localStorage.getItem('lab-lang'); if (v === 'ja' || v === 'en') return v; } catch (e) {}
+    return (navigator.language || '').toLowerCase().indexOf('ja') === 0 ? 'ja' : 'en';
+  })();
+
+  function T(k) { return window.I18N[LANG][k]; }
+
+  /* 日本語版に英語版を重ねる。構造とonMountは日本語版のものを使う */
+  function tr(base, over) {
+    if (LANG === 'ja' || !over) return base;
+    var o = {};
+    Object.keys(base).forEach(function (k) { o[k] = base[k]; });
+    Object.keys(over).forEach(function (k) { o[k] = over[k]; });
+    if (over.choices) {
+      o.choices = base.choices.map(function (c, i) {
+        var e = over.choices[i] || {};
+        return { text: e.text || c.text, feedback: e.feedback || c.feedback, score: c.score };
+      });
+    }
+    if (over.options) {
+      o.options = base.options.map(function (op, i) {
+        var e = over.options[i] || {};
+        var later = (e.later || op.later).map(function (r, j) {
+          return { label: r.label, v: r.v, bad: op.later[j] ? op.later[j].bad : r.bad };
+        });
+        return {
+          kind: op.kind, now: op.now, later: later,
+          text: e.text || op.text, verdict: e.verdict || op.verdict,
+          explain: e.explain || op.explain, laterText: e.laterText || op.laterText
+        };
+      });
+    }
+    return o;
+  }
+
+  function stage(i) { return tr(S[i], (window.STAGES_EN || {})[S[i].no]); }
+  function kase(i)  { return tr(C[i], (window.CASES_EN  || {})[C[i].no]); }
 
   var $ = function (id) { return document.getElementById(id); };
+  var screens = ['title', 'stage', 'case', 'result', 'cresult'];
 
-  var el = {
-    title:   $('screen-title'),
-    stage:   $('screen-stage'),
-    result:  $('screen-result'),
-    progress:$('progress'),
-    count:   $('bar-count'),
-    score:   $('bar-score'),
-    no:      $('stage-no'),
-    stTitle: $('stage-title'),
-    specimen:$('specimen'),
-    url:     $('specimen-url'),
-    mock:    $('mock'),
-    demoBtn: $('btn-demo'),
-    demoRes: $('demo-result'),
-    question:$('question'),
-    choices: $('choices'),
-    reveal:  $('reveal'),
-    verdict: $('reveal-verdict'),
-    feedback:$('reveal-feedback'),
-    pattern: $('reveal-pattern'),
-    psych:   $('reveal-psych'),
-    explain: $('reveal-explain'),
-    checks:  $('reveal-checks')
-  };
-
-  /* ---------- 画面切り替え ---------- */
   function show(name) {
-    el.title.hidden  = name !== 'title';
-    el.stage.hidden  = name !== 'stage';
-    el.result.hidden = name !== 'result';
+    screens.forEach(function (s) {
+      var node = $(s === 'title' ? 'screen-title' :
+                  s === 'stage' ? 'screen-stage' :
+                  s === 'case' ? 'screen-case' :
+                  s === 'result' ? 'screen-result' : 'screen-cresult');
+      node.hidden = (s !== name);
+    });
     window.scrollTo(0, 0);
   }
 
-  /* ---------- 進捗の目盛り ---------- */
-  function paintProgress() {
+  function smooth() {
+    return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+  function bring(node) {
+    node.scrollIntoView({ behavior: smooth() ? 'smooth' : 'auto', block: 'start' });
+  }
+  function sign(n, unit) {
+    unit = unit || '%';
+    if (n === 0) return '±0' + unit;
+    return (n > 0 ? '+' : '−') + Math.abs(n) + unit;
+  }
+
+  /* ===========================================================
+     検査モード
+     =========================================================== */
+  var D = { i: 0, results: [], picked: [], cleanup: null };
+
+  var el = {
+    progress: $('progress'), count: $('bar-count'), score: $('bar-score'),
+    no: $('stage-no'), title: $('stage-title'),
+    specimen: $('specimen'), url: $('specimen-url'), mock: $('mock'),
+    demoBtn: $('btn-demo'), demoRes: $('demo-result'),
+    question: $('question'), choices: $('choices'),
+    reveal: $('reveal'), verdict: $('reveal-verdict'), feedback: $('reveal-feedback'),
+    pattern: $('reveal-pattern'), psych: $('reveal-psych'),
+    explain: $('reveal-explain'), checks: $('reveal-checks')
+  };
+
+  function dProgress() {
     el.progress.innerHTML = '';
     for (var n = 0; n < S.length; n++) {
       var i = document.createElement('i');
-      var r = state.results[n];
-      if (r) {
-        i.className = r.score >= MAX ? 'is-hit' : (r.score > 0 ? 'is-part' : 'is-miss');
-      } else if (n === state.i) {
-        i.className = 'is-now';
-      }
+      var r = D.results[n];
+      if (r) i.className = r.score >= MAX ? 'is-hit' : (r.score > 0 ? 'is-part' : 'is-miss');
+      else if (n === D.i) i.className = 'is-now';
       el.progress.appendChild(i);
     }
-    var sum = state.results.reduce(function (a, r) { return a + r.score; }, 0);
-    el.count.textContent = '検体 ' + (state.i + 1) + ' / ' + S.length;
-    el.score.textContent = sum + ' 点';
+    var sum = D.results.reduce(function (a, r) { return a + r.score; }, 0);
+    el.count.textContent = T('specimen') + ' ' + (D.i + 1) + ' / ' + S.length;
+    el.score.textContent = sum + ' ' + T('points');
   }
 
-  /* ---------- 検体を1枚出す ---------- */
-  function renderStage() {
-    var st = S[state.i];
-
-    if (state.cleanup) { state.cleanup(); state.cleanup = null; }
-
-    paintProgress();
+  function dRender() {
+    var st = stage(D.i);
+    if (D.cleanup) { D.cleanup(); D.cleanup = null; }
+    dProgress();
 
     el.no.textContent = String(st.no).padStart(2, '0');
-    el.stTitle.textContent = st.title;
+    el.title.textContent = st.title;
     el.url.textContent = st.url;
-
     el.specimen.classList.remove('is-marked');
     el.mock.innerHTML = st.mock;
 
-    if (typeof st.onMount === 'function') {
-      state.cleanup = st.onMount(el.mock) || null;
-    }
+    if (typeof st.onMount === 'function') D.cleanup = st.onMount(el.mock, st) || null;
 
-    /* 実演ボタン */
     if (st.demo) {
       el.demoBtn.hidden = false;
       el.demoBtn.textContent = st.demo.label;
@@ -93,60 +127,47 @@
     }
     el.demoRes.hidden = true;
 
-    /* 設問 */
     el.question.textContent = st.question;
     el.choices.innerHTML = '';
     st.choices.forEach(function (c, n) {
       var b = document.createElement('button');
       b.className = 'choice';
       b.innerHTML = '<span class="choice__k">' + 'ABC'[n] + '</span><span>' + c.text + '</span>';
-      b.addEventListener('click', function () { answer(n); });
+      b.addEventListener('click', function () { dAnswer(n); });
       el.choices.appendChild(b);
     });
-
     el.reveal.hidden = true;
   }
 
-  /* ---------- 回答 ---------- */
-  function answer(n) {
-    var st = S[state.i];
-    var picked = st.choices[n];
+  function dAnswer(n) {
+    var st = stage(D.i), picked = st.choices[n];
     var best = st.choices.reduce(function (a, c, k) {
       return c.score > st.choices[a].score ? k : a;
     }, 0);
 
-    state.results[state.i] = {
+    D.picked[D.i] = n;
+    D.results[D.i] = {
       no: st.no, title: st.title, category: st.category,
-      score: picked.score, pattern: st.patternName, verdict: st.verdict
+      score: picked.score, pattern: st.patternName
     };
 
-    /* 選択肢の表示を確定させる */
     Array.prototype.forEach.call(el.choices.children, function (b, k) {
       b.disabled = true;
       if (k === n) b.classList.add('is-picked');
       if (k === best) b.classList.add('is-best');
     });
 
-    /* 検体に印を付ける */
     el.specimen.classList.add('is-marked');
+    if (st.demo) { el.demoBtn.disabled = false; el.demoBtn.style.opacity = '1'; }
 
-    /* 実演ボタンを解放 */
-    if (st.demo) {
-      el.demoBtn.disabled = false;
-      el.demoBtn.style.opacity = '1';
-    }
-
-    /* 種明かし */
     var isClear = st.verdict === 'white';
-    el.verdict.textContent = isClear
-      ? '正当な設計 — 疑う必要のなかった検体'
-      : '仕掛けあり — ' + st.category;
+    el.verdict.textContent = isClear ? T('verdictWhite') : T('verdictDark') + st.category;
     el.verdict.classList.toggle('is-clear', isClear);
 
     el.feedback.textContent = picked.feedback;
-    el.pattern.textContent  = st.patternName;
-    el.psych.textContent    = st.psychology;
-    el.explain.textContent  = st.explanation;
+    el.pattern.textContent = st.patternName;
+    el.psych.textContent = st.psychology;
+    el.explain.textContent = st.explanation;
 
     el.checks.innerHTML = '';
     st.checks.forEach(function (t) {
@@ -156,86 +177,61 @@
     });
 
     el.reveal.hidden = false;
-    paintProgress();
-
-    var smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    el.reveal.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+    dProgress();
+    bring(el.reveal);
   }
 
-  /* ---------- 実演 ---------- */
   el.demoBtn.addEventListener('click', function () {
-    var st = S[state.i];
+    var st = stage(D.i);
     if (!st.demo) return;
     el.mock.dispatchEvent(new CustomEvent('lab:demo'));
     el.demoRes.textContent = st.demo.result;
     el.demoRes.hidden = false;
-    el.specimen.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.specimen.scrollIntoView({ behavior: smooth() ? 'smooth' : 'auto', block: 'center' });
   });
 
-  /* ---------- 次へ ---------- */
   $('btn-next').addEventListener('click', function () {
-    if (state.i < S.length - 1) {
-      state.i++;
-      renderStage();
-      window.scrollTo(0, 0);
-    } else {
-      renderResult();
-    }
+    if (D.i < S.length - 1) { D.i++; dRender(); window.scrollTo(0, 0); }
+    else dResult();
   });
 
-  /* ---------- 結果 ---------- */
-  function renderResult() {
-    if (state.cleanup) { state.cleanup(); state.cleanup = null; }
-
-    var sum = state.results.reduce(function (a, r) { return a + r.score; }, 0);
+  function dResult() {
+    if (D.cleanup) { D.cleanup(); D.cleanup = null; }
+    var sum = D.results.reduce(function (a, r) { return a + r.score; }, 0);
+    var full = S.length * MAX;
     $('result-score').textContent = sum;
+    if ($('result-max')) $('result-max').textContent = full;
+    var pct = sum / full * 100;
 
-    var rank, lead;
-    if (sum >= 110) {
-      rank = '見抜く目がある';
-      lead = '仕掛けを見抜くだけでなく、正当な表示を正当だと判定できています。この2つは別の能力で、後者のほうが難しいものです。';
-    } else if (sum >= 85) {
-      rank = 'おおむね見抜けている';
-      lead = '多くの手法に気づけています。落とした分野が、あなたが実際に反応しやすい心理です。下の内訳を見てください。';
-    } else if (sum >= 55) {
-      rank = '反応してしまう場面がある';
-      lead = '知識の問題ではなく、その場の感情に判断を持っていかれた検体があります。急かされたときに一度離れる癖をつけるだけで、かなり変わります。';
-    } else {
-      rank = '設計どおりに動かされやすい';
-      lead = '落ち込む必要はありません。これらは、そう反応するように作られたものです。仕組みを知った今は、同じ画面の見え方が変わっているはずです。';
-    }
+    var r = T('rank').filter(function (x) { return pct >= x.min; })[0];
+    var rank = r.t, lead = r.d;
     $('result-rank').textContent = rank;
     $('result-lead').textContent = lead;
 
-    /* 分野別 */
     var cats = {};
-    state.results.forEach(function (r) {
+    D.results.forEach(function (r) {
       if (!cats[r.category]) cats[r.category] = { got: 0, max: 0 };
       cats[r.category].got += r.score;
       cats[r.category].max += MAX;
     });
-
     var box = $('result-cats');
     box.innerHTML = '';
     Object.keys(cats).forEach(function (k) {
-      var c = cats[k];
-      var pct = Math.round(c.got / c.max * 100);
+      var c = cats[k], pct = Math.round(c.got / c.max * 100);
       var row = document.createElement('div');
       row.className = 'cat';
-      row.innerHTML =
-        '<span>' + k + '</span>' +
+      row.innerHTML = '<span>' + k + '</span>' +
         '<span class="cat__bar' + (pct < 60 ? ' is-weak' : '') + '"><i style="width:' + pct + '%"></i></span>' +
         '<span class="cat__val">' + pct + '%</span>';
       box.appendChild(row);
     });
 
-    /* 落とした検体 */
-    var missed = state.results.filter(function (r) { return r.score < MAX; });
+    var missed = D.results.filter(function (r) { return r.score < MAX; });
     var mb = $('result-missed');
     mb.innerHTML = '';
     if (missed.length) {
       var h = document.createElement('h3');
-      h.textContent = '取りこぼした検体';
+      h.textContent = T('missedH');
       mb.appendChild(h);
       missed.forEach(function (r) {
         var d = document.createElement('div');
@@ -244,23 +240,266 @@
         mb.appendChild(d);
       });
     }
-
     show('result');
   }
 
-  /* ---------- 開始・やり直し ---------- */
-  $('btn-start').addEventListener('click', function () {
-    state.i = 0;
-    state.results = [];
-    renderStage();
-    show('stage');
+  /* ===========================================================
+     設計モード
+     =========================================================== */
+  var G = { i: 0, picks: [], pickedIdx: [], cv: 0, trust: 0 };
+
+  var ce = {
+    progress: $('c-progress'), count: $('c-count'), score: $('c-score'),
+    no: $('c-no'), title: $('c-title'), field: $('c-field'), brief: $('c-brief'),
+    question: $('c-question'), choices: $('c-choices'),
+    now: $('c-now'), cv: $('c-cv'), cvLab: $('c-cv-lab'), tr: $('c-tr'),
+    laterBtn: $('btn-later'), later: $('c-later'),
+    laterText: $('c-later-text'), laterRows: $('c-later-rows'),
+    reveal: $('c-reveal'), verdict: $('c-verdict'),
+    explain: $('c-explain'), lesson: $('c-lesson')
+  };
+
+  var KIND_CLASS = { good: 'is-hit', 'null': 'is-part', dark: 'is-miss' };
+
+  function gProgress() {
+    ce.progress.innerHTML = '';
+    for (var n = 0; n < C.length; n++) {
+      var i = document.createElement('i');
+      var p = G.picks[n];
+      if (p) i.className = KIND_CLASS[p.kind];
+      else if (n === G.i) i.className = 'is-now';
+      ce.progress.appendChild(i);
+    }
+    ce.count.textContent = T('caseWord') + ' ' + (G.i + 1) + ' / ' + C.length;
+    ce.score.textContent = T('scoreLine').replace('{cv}', sign(G.cv, '')).replace('{tr}', sign(G.trust, ''));
+  }
+
+  function gRender() {
+    var cs = kase(G.i);
+    gProgress();
+    ce.no.textContent = String(cs.no).padStart(2, '0');
+    ce.title.textContent = cs.title;
+    ce.field.textContent = cs.field;
+    ce.brief.textContent = cs.brief;
+    ce.question.textContent = cs.question;
+
+    ce.choices.innerHTML = '';
+    cs.options.forEach(function (o, n) {
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.innerHTML = '<span class="choice__k">' + 'ABC'[n] + '</span><span>' + o.text + '</span>';
+      b.addEventListener('click', function () { gPick(n); });
+      ce.choices.appendChild(b);
+    });
+
+    ce.now.hidden = true;
+    ce.later.hidden = true;
+    ce.reveal.hidden = true;
+  }
+
+  function gPick(n) {
+    var cs = kase(G.i), o = cs.options[n];
+
+    if (G.pickedIdx[G.i] != null) {           /* 選び直し・言語切替のときは前回分を戻す */
+      var prev = cs.options[G.pickedIdx[G.i]];
+      G.cv -= prev.now.cv; G.trust -= prev.now.trust;
+    }
+    G.pickedIdx[G.i] = n;
+    G.picks[G.i] = { kind: o.kind, title: cs.title, text: o.text, verdict: o.verdict };
+    G.cv += o.now.cv;
+    G.trust += o.now.trust;
+
+    Array.prototype.forEach.call(ce.choices.children, function (b, k) {
+      b.disabled = true;
+      if (k === n) b.classList.add('is-picked');
+    });
+
+    ce.cvLab.textContent = cs.metric;
+    ce.cv.textContent = sign(o.now.cv);
+    ce.tr.textContent = sign(o.now.trust);
+    ce.cv.className = 'board__num ' + (o.now.cv > 0 ? 'is-up' : o.now.cv < 0 ? 'is-down' : 'is-flat');
+    ce.tr.className = 'board__num ' + (o.now.trust > 0 ? 'is-up' : o.now.trust < 0 ? 'is-down' : 'is-flat');
+
+    ce.now.hidden = false;
+    ce.later.hidden = true;
+    ce.reveal.hidden = true;
+    ce.laterBtn.disabled = false;
+
+    gProgress();
+    bring(ce.now);
+  }
+
+  ce.laterBtn.addEventListener('click', function () {
+    var cs = kase(G.i), p = G.picks[G.i];
+    var o = cs.options.filter(function (x) { return x.text === p.text; })[0];
+
+    ce.laterText.textContent = o.laterText;
+    ce.laterRows.innerHTML = '';
+    o.later.forEach(function (r) {
+      var d = document.createElement('div');
+      d.className = 'lrow' + (r.bad ? ' is-bad' : ' is-good');
+      d.innerHTML = '<span>' + r.label + '</span><b>' + r.v + '</b>';
+      ce.laterRows.appendChild(d);
+    });
+
+    var kindLabel = { dark: T('kindDark'), good: T('kindGood'), 'null': T('kindNull') };
+    ce.verdict.textContent = kindLabel[o.kind] + ' — ' + o.verdict;
+    ce.verdict.classList.toggle('is-clear', o.kind === 'good');
+    ce.verdict.classList.toggle('is-flatv', o.kind === 'null');
+    ce.explain.textContent = o.explain;
+    ce.lesson.textContent = cs.lesson;
+
+    ce.later.hidden = false;
+    ce.reveal.hidden = false;
+    ce.laterBtn.disabled = true;
+    bring(ce.later);
   });
 
-  $('btn-retry').addEventListener('click', function () {
-    state.i = 0;
-    state.results = [];
-    renderStage();
-    show('stage');
+  $('c-next').addEventListener('click', function () {
+    if (G.i < C.length - 1) { G.i++; gRender(); window.scrollTo(0, 0); }
+    else gResult();
   });
+
+  function gResult() {
+    $('cr-cv').textContent = sign(G.cv, '');
+    $('cr-tr').textContent = sign(G.trust, '');
+
+    var avg = G.trust / C.length;
+    var r = T('crank').filter(function (x) { return avg >= x.min; })[0];
+    var rank = r.t, lead = r.d;
+    $('cr-rank').textContent = rank;
+    $('cr-lead').textContent = lead;
+
+    var list = $('cr-list');
+    list.innerHTML = '';
+    G.picks.forEach(function (p, n) {
+      var d = document.createElement('div');
+      d.className = 'pick pick--' + p.kind;
+      d.innerHTML = '<b>' + String(n + 1).padStart(2, '0') + '　' + p.title + '</b>' +
+                    '<span>' + p.verdict + '</span>';
+      list.appendChild(d);
+    });
+    show('cresult');
+  }
+
+  /* ===========================================================
+     入口に散らした見本
+     =========================================================== */
+  (function scatter() {
+    var chips = document.querySelectorAll('.chip');
+    if (!chips.length) return;
+
+    Array.prototype.forEach.call(chips, function (c) {
+      c.setAttribute('aria-label', c.textContent.trim() + '（' + c.dataset.name + '）');
+      c.addEventListener('click', function () {
+        var wasOpen = c.classList.contains('is-open');
+        Array.prototype.forEach.call(chips, function (o) { o.classList.remove('is-open'); });
+        if (!wasOpen) c.classList.add('is-open');
+      });
+    });
+
+    /* 見本のタイマー。放っておくと勝手に最初へ戻る */
+    var clock = document.querySelector('[data-sc-clock]');
+    if (!clock) return;
+    var START = 180, left = START, elapsed = 0;
+
+    setInterval(function () {
+      left--; elapsed++;
+      if (elapsed >= 18) {          // 18秒で何事もなかったように戻す
+        left = START; elapsed = 0;
+      }
+      if (left < 0) left = START;
+      clock.textContent = String(Math.floor(left / 60)).padStart(2, '0') + ':' +
+                          String(left % 60).padStart(2, '0');
+    }, 1000);
+  })();
+
+  /* ===========================================================
+     文言の差し替えと言語の切り替え
+     =========================================================== */
+  function applyI18n() {
+    document.documentElement.lang = T('htmlLang');
+    document.title = T('docTitle');
+
+    document.querySelectorAll('[data-i18n]').forEach(function (n) {
+      n.textContent = T(n.dataset.i18n);
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(function (n) {
+      n.innerHTML = T(n.dataset.i18nHtml);
+    });
+    document.querySelectorAll('[data-i18n-attr]').forEach(function (n) {
+      n.dataset.i18nAttr.split(',').forEach(function (pair) {
+        var kv = pair.split(':');
+        n.setAttribute(kv[0].trim(), T(kv[1].trim()));
+      });
+    });
+
+    var sn = $('source-note');
+    if (sn) {
+      var parts = T('sourceNote').split('{link}');
+      sn.innerHTML = parts[0] +
+        '<a href="https://deceptive.design/types" target="_blank" rel="noopener">Deceptive Patterns</a>' +
+        (parts[1] || '');
+    }
+
+    var lb = $('btn-lang');
+    lb.textContent = T('langSwitch');
+    lb.setAttribute('aria-label', T('langSwitchLabel'));
+
+    /* 見本のラベルは data-name を読むので、開いていれば付け替える */
+    document.querySelectorAll('.chip').forEach(function (c) {
+      c.setAttribute('aria-label', (c.textContent || '').trim() + ' — ' + c.dataset.name);
+    });
+  }
+
+  $('btn-lang').addEventListener('click', function () {
+    LANG = (LANG === 'ja') ? 'en' : 'ja';
+    try { localStorage.setItem('lab-lang', LANG); } catch (e) {}
+    applyI18n();
+
+    /* 表示中の画面を、進行状況を保ったまま組み直す */
+    if (!$('screen-stage').hidden) {
+      dRender();
+      if (D.picked[D.i] != null) dAnswer(D.picked[D.i]);
+      window.scrollTo(0, 0);
+    } else if (!$('screen-case').hidden) {
+      gRender();
+      if (G.pickedIdx[G.i] != null) {
+        var keep = G.pickedIdx[G.i];
+        gPick(keep);
+        ce.laterBtn.click();
+      }
+      window.scrollTo(0, 0);
+    } else if (!$('screen-result').hidden) {
+      dResult();
+    } else if (!$('screen-cresult').hidden) {
+      gResult();
+    }
+  });
+
+  applyI18n();
+
+  /* ===========================================================
+     入口
+     =========================================================== */
+  function startDetect() {
+    D.i = 0; D.results = []; D.picked = [];
+    dRender(); show('stage');
+  }
+  function startDesign() {
+    G.i = 0; G.picks = []; G.pickedIdx = []; G.cv = 0; G.trust = 0;
+    gRender(); show('case');
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.mode'), function (b) {
+    b.addEventListener('click', function () {
+      if (b.dataset.mode === 'detect') startDetect(); else startDesign();
+    });
+  });
+
+  $('btn-retry').addEventListener('click', startDetect);
+  $('cr-retry').addEventListener('click', startDesign);
+  $('btn-to-design').addEventListener('click', startDesign);
+  $('btn-to-detect').addEventListener('click', startDetect);
 
 })();

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>クリック心理ラボ — なぜ、あなたは押してしまうのか</title>
-<meta name="description" content="偽のランディングページを検体として観察し、自分がどの心理に反応したのかを確かめる練習場です。">
+<title>クリック心理ラボ — なぜ、人は思わず行動してしまうのか</title>
+<meta name="description" content="人を動かす設計を、見破る側と作る側の両方から練習する場所です。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -12,41 +12,81 @@
 </head>
 <body>
 
+<button class="lang" id="btn-lang">English</button>
+
 <div class="shell">
 
   <!-- ============ タイトル ============ -->
   <section class="screen screen--title" id="screen-title">
-    <p class="title__over">クリック心理ラボ</p>
-    <h1 class="title__h">なぜ、あなたは<br>押してしまうのか</h1>
-    <p class="title__lead">
-      12枚のページを検査台に載せます。ほとんどは、あなたを急がせたり、
-      恥ずかしがらせたり、見落とさせたりするために作られたものです。
-      ただし2枚だけ、まったく正当なページが混ざっています。
-      すべてを疑う人は、そこで点を落とします。
+    <p class="title__over" data-i18n="over">クリック心理ラボ</p>
+    <h1 class="title__h" data-i18n-html="h1">なぜ、人は思わず<br>行動してしまうのか</h1>
+
+    <p class="title__lead" data-i18n="lead1"></p>
+    <p class="title__lead" data-i18n="lead2"></p>
+
+    <div class="scatter">
+      <button class="chip chip--badge"  data-i18n="chipBadge"  data-i18n-attr="data-name:nameBadge"></button>
+      <button class="chip chip--timer"  data-i18n-attr="data-name:nameTimer"><span data-sc-clock>03:00</span></button>
+      <button class="chip chip--cta"    data-i18n="chipCta"    data-i18n-attr="data-name:nameCta"></button>
+      <button class="chip chip--fine"   data-i18n="chipFine"   data-i18n-attr="data-name:nameFine"></button>
+      <button class="chip chip--social" data-i18n="chipSocial" data-i18n-attr="data-name:nameSocial"></button>
+      <button class="chip chip--shame"  data-i18n="chipShame"  data-i18n-attr="data-name:nameShame"></button>
+    </div>
+    <p class="scatter__hint" data-i18n="scatterHint"></p>
+
+    <div class="notes">
+      <div class="primer">
+        <p class="primer__h" data-i18n="primerH"></p>
+        <p class="primer__t" data-i18n="primerT1"></p>
+        <p class="primer__t" data-i18n="primerT2"></p>
+      </div>
+      <div class="primer primer--color">
+        <p class="primer__h" data-i18n="colorH"></p>
+        <p class="primer__t" data-i18n="colorT1"></p>
+        <p class="primer__t" data-i18n="colorT2"></p>
+      </div>
+    </div>
+
+    <p class="note-reg" data-i18n="noteReg"></p>
+
+    <div class="modes">
+      <button class="mode" data-mode="detect">
+        <span class="mode__tag mode__tag--d" data-i18n="modeDetectTag"></span>
+        <span class="mode__h" data-i18n="modeDetectH"></span>
+        <span class="mode__t" data-i18n="modeDetectT"></span>
+        <span class="mode__meta" data-i18n="modeDetectMeta"></span>
+      </button>
+      <button class="mode" data-mode="design">
+        <span class="mode__tag mode__tag--g" data-i18n="modeDesignTag"></span>
+        <span class="mode__h" data-i18n="modeDesignH"></span>
+        <span class="mode__t" data-i18n="modeDesignT"></span>
+        <span class="mode__meta" data-i18n="modeDesignMeta"></span>
+      </button>
+    </div>
+
+    <p class="title__fine">
+      <span data-i18n="fictional"></span><br>
+      <span id="source-note"></span>
     </p>
-    <ul class="title__facts">
-      <li><b>12</b><span>検体</span></li>
-      <li><b>2</b><span>正当な事例</span></li>
-      <li><b>約8分</b><span>所要時間</span></li>
-    </ul>
-    <button class="btn btn--go" id="btn-start">検査を始める</button>
-    <p class="title__fine">登場する企業・サービス・商品はすべて架空のものです。</p>
+
+    <footer class="credit">
+      <p class="credit__t" data-i18n="creditT"></p>
+      <a class="credit__link" href="https://ark-corp.tokyo/" target="_blank" rel="noopener" data-i18n="creditName"></a>
+    </footer>
   </section>
 
-  <!-- ============ 検査 ============ -->
+  <!-- ============ 検査モード ============ -->
   <section class="screen screen--stage" id="screen-stage" hidden>
-
     <header class="bar">
       <div class="bar__track" id="progress"></div>
       <div class="bar__meta">
-        <span id="bar-count">検体 1 / 12</span>
-        <span id="bar-score">0 点</span>
+        <span id="bar-count"></span>
+        <span id="bar-score"></span>
       </div>
     </header>
 
     <h2 class="stage__h"><span class="stage__no" id="stage-no">01</span><span id="stage-title"></span></h2>
 
-    <!-- 検体 -->
     <figure class="specimen" id="specimen">
       <figcaption class="specimen__chrome">
         <span class="specimen__dots"><i></i><i></i><i></i></span>
@@ -58,53 +98,111 @@
     <button class="btn btn--demo" id="btn-demo" hidden></button>
     <p class="demo-result" id="demo-result" hidden></p>
 
-    <!-- 設問 -->
-    <div class="ask" id="ask">
+    <div class="ask">
       <p class="ask__q" id="question"></p>
       <div class="ask__choices" id="choices"></div>
     </div>
 
-    <!-- 種明かし -->
     <div class="reveal" id="reveal" hidden>
       <p class="reveal__verdict" id="reveal-verdict"></p>
       <p class="reveal__feedback" id="reveal-feedback"></p>
-
       <dl class="reveal__defs">
-        <div><dt>手法の名前</dt><dd id="reveal-pattern"></dd></div>
-        <div><dt>働いている心理</dt><dd id="reveal-psych"></dd></div>
+        <div><dt data-i18n="patternLabel"></dt><dd id="reveal-pattern"></dd></div>
+        <div><dt data-i18n="psychLabel"></dt><dd id="reveal-psych"></dd></div>
       </dl>
-
       <p class="reveal__body" id="reveal-explain"></p>
-
       <div class="reveal__checks">
-        <p class="reveal__checksH">次に出会ったときの確かめ方</p>
+        <p class="reveal__checksH" data-i18n="checksH"></p>
         <ul id="reveal-checks"></ul>
       </div>
-
-      <button class="btn btn--go" id="btn-next">次の検体へ</button>
+      <button class="btn btn--go" id="btn-next" data-i18n="nextStage"></button>
     </div>
   </section>
 
-  <!-- ============ 結果 ============ -->
-  <section class="screen screen--result" id="screen-result" hidden>
-    <p class="result__over">検査終了</p>
-    <div class="result__score"><b id="result-score">0</b><span>/ 120</span></div>
-    <p class="result__rank" id="result-rank"></p>
-    <p class="result__lead" id="result-lead"></p>
+  <!-- ============ 設計モード ============ -->
+  <section class="screen screen--case" id="screen-case" hidden>
+    <header class="bar">
+      <div class="bar__track" id="c-progress"></div>
+      <div class="bar__meta">
+        <span id="c-count"></span>
+        <span id="c-score"></span>
+      </div>
+    </header>
 
-    <div class="result__breakdown">
-      <p class="result__bh">分野ごとの結果</p>
-      <div id="result-cats"></div>
+    <h2 class="stage__h"><span class="stage__no" id="c-no">01</span><span id="c-title"></span></h2>
+
+    <div class="brief">
+      <p class="brief__field" id="c-field"></p>
+      <p class="brief__t" id="c-brief"></p>
     </div>
 
-    <div class="result__missed" id="result-missed"></div>
+    <div class="ask">
+      <p class="ask__q" id="c-question"></p>
+      <div class="ask__choices" id="c-choices"></div>
+    </div>
 
-    <button class="btn btn--go" id="btn-retry">もう一度検査する</button>
+    <div class="board" id="c-now" hidden>
+      <p class="board__h" data-i18n="boardNow"></p>
+      <div class="board__pair">
+        <div class="board__cell"><span id="c-cv" class="board__num"></span><span class="board__lab" id="c-cv-lab"></span></div>
+        <div class="board__cell"><span id="c-tr" class="board__num"></span><span class="board__lab" data-i18n="boardTrust"></span></div>
+      </div>
+      <button class="btn btn--later" id="btn-later" data-i18n="laterBtn"></button>
+    </div>
+
+    <div class="board board--later" id="c-later" hidden>
+      <p class="board__h" data-i18n="boardLater"></p>
+      <p class="board__lead" id="c-later-text"></p>
+      <div id="c-later-rows"></div>
+    </div>
+
+    <div class="reveal" id="c-reveal" hidden>
+      <p class="reveal__verdict" id="c-verdict"></p>
+      <p class="reveal__body" id="c-explain"></p>
+      <p class="lesson" id="c-lesson"></p>
+      <button class="btn btn--go" id="c-next" data-i18n="nextCase"></button>
+    </div>
+  </section>
+
+  <!-- ============ 検査モードの結果 ============ -->
+  <section class="screen screen--result" id="screen-result" hidden>
+    <p class="result__over" data-i18n="resultOver"></p>
+    <div class="result__score"><b id="result-score">0</b><span>/ <i id="result-max">200</i></span></div>
+    <p class="result__rank" id="result-rank"></p>
+    <p class="result__lead" id="result-lead"></p>
+    <div class="result__breakdown">
+      <p class="result__bh" data-i18n="catsH"></p>
+      <div id="result-cats"></div>
+    </div>
+    <div class="result__missed" id="result-missed"></div>
+    <button class="btn btn--go" id="btn-retry" data-i18n="retry"></button>
+    <button class="btn btn--sub" id="btn-to-design" data-i18n="toDesign"></button>
+  </section>
+
+  <!-- ============ 設計モードの結果 ============ -->
+  <section class="screen screen--cresult" id="screen-cresult" hidden>
+    <p class="result__over" data-i18n="resultOver"></p>
+    <div class="twin">
+      <div class="twin__cell"><b id="cr-cv">0</b><span data-i18n="cvLabel"></span></div>
+      <div class="twin__cell"><b id="cr-tr">0</b><span data-i18n="trLabel"></span></div>
+    </div>
+    <p class="result__rank" id="cr-rank"></p>
+    <p class="result__lead" id="cr-lead"></p>
+    <div class="result__breakdown">
+      <p class="result__bh" data-i18n="picksH"></p>
+      <div id="cr-list"></div>
+    </div>
+    <button class="btn btn--go" id="cr-retry" data-i18n="retryCase"></button>
+    <button class="btn btn--sub" id="btn-to-detect" data-i18n="toDetect"></button>
   </section>
 
 </div>
 
+<script src="data/i18n.js"></script>
 <script src="data/stages.js"></script>
+<script src="data/cases.js"></script>
+<script src="data/stages.en.js"></script>
+<script src="data/cases.en.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

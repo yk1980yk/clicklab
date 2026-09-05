@@ -4,19 +4,19 @@
    =========================================================== */
 
 :root{
-  --paper:#E6E8E2;
-  --paper-2:#F2F3EE;
-  --white:#FCFCFA;
-  --ink:#1C2027;
-  --ink-2:#5C6470;
-  --ink-3:#8A9199;
-  --line:#C3C8BC;
-  --line-2:#D9DDD3;
-  --signal:#BE2A1C;
-  --signal-bg:#FBEBE8;
-  --clear:#2B6A4D;
-  --clear-bg:#E8F1EA;
-  --amber:#9C6B0C;
+  --paper:#E3E7EA;
+  --paper-2:#F1F4F5;
+  --white:#FCFDFD;
+  --ink:#18232B;
+  --ink-2:#536470;
+  --ink-3:#828E98;
+  --line:#BFC8CE;
+  --line-2:#D5DCE0;
+  --signal:#C22D1C;
+  --signal-bg:#FAEAE7;
+  --clear:#1E6B5A;
+  --clear-bg:#E1EFEB;
+  --amber:#95680C;
 }
 
 *{box-sizing:border-box}
@@ -87,10 +87,11 @@ body{
   letter-spacing:-.01em;
 }
 .title__lead{
-  margin:0 0 36px;
+  margin:0 0 16px;
   max-width:34em;
   color:#333A44;
 }
+.title__lead:first-of-type{font-weight:500;color:var(--ink)}
 .title__facts{
   display:flex;
   gap:36px;
@@ -106,9 +107,12 @@ body{
 .title__fine{
   margin:18px 0 0;
   font-size:.76rem;
+  line-height:1.9;
   color:var(--ink-3);
   text-align:center;
 }
+.title__fine a{color:var(--ink-2);text-decoration:underline;text-underline-offset:2px}
+.title__fine a:hover{color:var(--ink)}
 
 /* ===========================================================
    検査バー
@@ -413,6 +417,359 @@ body{
 }
 .miss b{display:block;font-size:.93rem;margin-bottom:2px}
 
+/* ---- 入口に散らした見本 ---- */
+.scatter{
+  position:relative;
+  height:252px;
+  margin:34px 0 4px;
+}
+.chip{
+  position:absolute;
+  font:inherit;
+  border:none;
+  cursor:pointer;
+  border-radius:3px;
+  line-height:1.5;
+  box-shadow:0 2px 10px rgba(28,32,39,.13);
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.chip:hover{box-shadow:0 6px 20px rgba(28,32,39,.2);z-index:9}
+.chip:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+
+/* 仕掛けの名前（触れると出る） */
+.chip::after{
+  content:attr(data-name);
+  position:absolute;
+  left:50%;
+  bottom:-9px;
+  transform:translate(-50%,100%) scale(.9);
+  padding:2px 8px;
+  background:var(--ink);
+  color:var(--paper-2);
+  font-size:.64rem;
+  font-weight:700;
+  letter-spacing:.02em;
+  white-space:nowrap;
+  border-radius:1px;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .18s,transform .18s;
+}
+.chip.is-open::after{opacity:1;transform:translate(-50%,100%) scale(1)}
+.chip.is-open{box-shadow:0 6px 20px rgba(28,32,39,.22);z-index:10}
+
+/* --- それぞれの見た目と位置（デスクトップ） --- */
+.chip--badge{
+  left:5%;  top:0;    transform:rotate(-9deg);
+  padding:5px 13px;
+  background:#FFE100;color:#B31905;
+  font-size:.8rem;font-weight:900;
+}
+.chip--timer{
+  left:16%; top:38px; transform:rotate(4deg);
+  padding:11px 18px;
+  background:#FFF6E0;border:1px solid #F0D48A;color:#D81E06;
+  font-family:"Roboto Mono",monospace;font-size:1.6rem;font-weight:700;
+}
+.chip--cta{
+  left:9%;  top:148px; transform:rotate(-4deg);
+  padding:15px 30px;
+  background:#1DB954;color:#fff;
+  font-size:1.06rem;font-weight:900;
+  box-shadow:0 3px 0 #148540,0 6px 18px rgba(28,32,39,.18);
+}
+.chip--social{
+  left:53%; top:4px;   transform:rotate(7deg);
+  padding:8px 15px;
+  background:var(--white);border:1px solid var(--line-2);color:#6A6A6A;
+  font-size:.8rem;
+}
+.chip--fine{
+  left:37%; top:86px;  transform:rotate(-3deg);
+  max-width:270px;
+  padding:10px 14px;
+  background:var(--white);border:1px solid var(--line-2);color:#BFBFBF;
+  font-size:.66rem;text-align:left;
+}
+.chip--shame{
+  left:48%; top:170px; transform:rotate(5deg);
+  padding:9px 16px;
+  background:var(--white);border:1px solid var(--line-2);color:#AFAFAF;
+  font-size:.78rem;text-decoration:underline;
+}
+
+.scatter__hint{
+  margin:0 0 4px;
+  font-size:.72rem;
+  color:var(--ink-3);
+  text-align:center;
+}
+
+/* --- モバイルは3枚に絞る --- */
+@media(max-width:639px){
+  .scatter{height:212px;margin:28px 0 4px}
+  .chip--badge,.chip--social,.chip--fine{display:none}
+  .chip--timer{left:2%;  top:4px;   transform:rotate(-4deg);font-size:1.4rem;padding:10px 15px}
+  .chip--cta{  left:26%; top:78px;  transform:rotate(3deg); font-size:.98rem;padding:14px 24px}
+  .chip--shame{left:8%;  top:160px; transform:rotate(-2deg)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .chip,.chip::after{transition:none}
+}
+
+/* ---- ダークパターンの説明 ---- */
+.notes{display:grid;gap:12px;margin:32px 0 0}
+@media(min-width:680px){.notes{grid-template-columns:1fr 1fr}}
+
+.primer{
+  padding:22px 24px;
+  background:var(--white);
+  border:1px solid var(--line);
+  border-left:3px solid var(--signal);
+}
+.primer--color{border-left-color:var(--clear)}
+.primer--color .primer__h{color:var(--clear)}
+
+.primer__h{
+  margin:0 0 10px;
+  font-size:.8rem;
+  font-weight:700;
+  letter-spacing:.1em;
+  color:var(--signal);
+}
+.primer__t{
+  margin:0 0 12px;
+  font-size:.86rem;
+  line-height:1.9;
+  color:#2E3A44;
+}
+.primer__t:last-child{margin-bottom:0}
+
+.note-reg{
+  margin:14px 0 30px;
+  font-size:.79rem;
+  line-height:1.9;
+  color:var(--ink-2);
+}
+
+@media(max-width:520px){
+  .primer{padding:18px 18px}
+}
+
+/* ---- 署名 ---- */
+.credit{
+  margin-top:44px;
+  padding-top:22px;
+  border-top:1px solid var(--line);
+  display:flex;
+  flex-wrap:wrap;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:10px;
+}
+.credit__t{
+  margin:0;
+  max-width:32em;
+  font-size:.78rem;
+  line-height:1.8;
+  color:var(--ink-2);
+}
+.credit__link{
+  flex:none;
+  font-size:.82rem;
+  font-weight:700;
+  color:var(--ink);
+  text-decoration:none;
+  border-bottom:1px solid var(--line);
+  padding-bottom:1px;
+}
+.credit__link:hover{border-bottom-color:var(--ink)}
+
+/* ===========================================================
+   モード選択
+   =========================================================== */
+.modes{display:grid;gap:12px;margin:0 0 26px}
+@media(min-width:640px){.modes{grid-template-columns:1fr 1fr}}
+
+.mode{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:7px;
+  padding:22px 20px 18px;
+  text-align:left;
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:2px;
+  font:inherit;
+  color:var(--ink);
+  cursor:pointer;
+  transition:border-color .12s,transform .12s;
+}
+.mode:hover{border-color:var(--ink)}
+.mode:active{transform:translateY(1px)}
+.mode:focus-visible{outline:2px solid var(--signal);outline-offset:3px}
+
+.mode__tag{
+  padding:2px 9px;
+  font-size:.68rem;
+  font-weight:700;
+  letter-spacing:.08em;
+  border-radius:1px;
+  color:#fff;
+}
+.mode__tag--d{background:var(--signal)}
+.mode__tag--g{background:var(--clear)}
+.mode__h{font-size:1.14rem;font-weight:900;line-height:1.4}
+.mode__t{font-size:.85rem;line-height:1.75;color:#3B424C}
+.mode__meta{
+  margin-top:4px;
+  font-family:"Roboto Mono",monospace;
+  font-size:.68rem;
+  color:var(--ink-3);
+}
+
+.btn--sub{
+  display:block;
+  width:100%;
+  margin-top:9px;
+  padding:14px;
+  background:transparent;
+  border:1px solid var(--line);
+  color:var(--ink-2);
+  font-size:.88rem;
+}
+.btn--sub:hover{border-color:var(--ink);color:var(--ink)}
+
+/* ===========================================================
+   設計モード
+   =========================================================== */
+.brief{
+  padding:18px 20px;
+  background:var(--white);
+  border:1px solid var(--line);
+  border-left:3px solid var(--ink);
+}
+.brief__field{
+  margin:0 0 6px;
+  font-family:"Roboto Mono",monospace;
+  font-size:.68rem;
+  color:var(--ink-3);
+}
+.brief__t{margin:0;font-size:.93rem;line-height:1.8}
+
+/* ---- 今月の数字 ---- */
+.board{
+  margin-top:30px;
+  padding:20px;
+  background:var(--white);
+  border:1px solid var(--line);
+}
+.board__h{
+  margin:0 0 14px;
+  font-size:.76rem;
+  font-weight:700;
+  letter-spacing:.14em;
+  color:var(--ink-2);
+}
+.board__pair{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.board__cell{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  padding:14px 0;
+  border-top:1px solid var(--line-2);
+}
+.board__num{
+  font-family:"Roboto Mono",monospace;
+  font-size:2.2rem;
+  font-weight:700;
+  line-height:1;
+}
+.board__num.is-up{color:var(--clear)}
+.board__num.is-down{color:var(--signal)}
+.board__num.is-flat{color:var(--ink-3)}
+.board__lab{font-size:.76rem;color:var(--ink-2)}
+
+.btn--later{
+  width:100%;
+  margin-top:16px;
+  padding:13px;
+  background:var(--ink);
+  color:var(--paper-2);
+  font-size:.9rem;
+}
+.btn--later:disabled{opacity:.3;cursor:default}
+
+/* ---- 翌月 ---- */
+.board--later{border-top:3px solid var(--ink)}
+.board__lead{
+  margin:0 0 14px;
+  font-size:.93rem;
+  font-weight:700;
+  line-height:1.7;
+}
+.lrow{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  gap:14px;
+  padding:10px 0;
+  border-bottom:1px solid var(--line-2);
+  font-size:.86rem;
+}
+.lrow:last-child{border-bottom:none}
+.lrow b{
+  font-family:"Roboto Mono",monospace;
+  font-size:.95rem;
+  text-align:right;
+}
+.lrow.is-bad b{color:var(--signal)}
+.lrow.is-good b{color:var(--clear)}
+
+.lesson{
+  margin:0 0 28px;
+  padding:14px 16px;
+  background:var(--paper-2);
+  border-left:3px solid var(--ink);
+  font-size:.9rem;
+  font-weight:700;
+}
+
+.reveal__verdict.is-flatv{color:var(--ink-2)}
+
+/* ---- 設計モードの結果 ---- */
+.twin{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px}
+.twin__cell{display:flex;flex-direction:column;gap:4px;padding-top:14px;border-top:2px solid var(--ink)}
+.twin__cell b{font-family:"Roboto Mono",monospace;font-size:2.9rem;font-weight:700;line-height:1}
+.twin__cell span{font-size:.78rem;color:var(--ink-2)}
+
+.pick{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  gap:14px;
+  padding:12px 14px;
+  margin-bottom:7px;
+  font-size:.86rem;
+  border-left:3px solid var(--ink-3);
+  background:var(--paper-2);
+}
+.pick b{font-weight:700}
+.pick span{flex:none;font-size:.78rem;color:var(--ink-2);text-align:right}
+.pick--dark{border-left-color:var(--signal);background:var(--signal-bg)}
+.pick--good{border-left-color:var(--clear);background:var(--clear-bg)}
+
+.screen--cresult .result__breakdown{margin-bottom:34px}
+
+@media(max-width:520px){
+  .board__num{font-size:1.8rem}
+  .twin__cell b{font-size:2.2rem}
+  .pick{flex-direction:column;gap:3px}
+  .pick span{text-align:left}
+}
+
 /* ===========================================================
    ここから下は「検体」の見た目
    実際のWebに寄せて、あえて派手にしている
@@ -536,3 +893,118 @@ body{
 .m-proof__reviews p{display:flex;justify-content:space-between;gap:12px;margin:0;padding:9px 0;border-bottom:1px solid #F2F2F2;font-size:.8rem;color:#555}
 .m-proof__reviews span{flex:none;color:#BDBDBD;font-size:.68rem;font-family:"Roboto Mono",monospace}
 .m-proof__cta{display:block;width:100%;margin-top:16px;padding:15px;background:#E0407A;color:#fff;font-size:1rem;font-weight:900;border-radius:24px}
+
+/* ---- 13 ステマ記事 ---- */
+.m-stealth__meta{font-size:.7rem;color:#9AA0A6;margin-bottom:8px}
+.m-stealth__h{margin:0 0 12px;font-size:1.16rem;font-weight:900;line-height:1.5;color:#202124}
+.m-stealth__lead,.m-stealth__body{margin:0 0 10px;font-size:.84rem;color:#4A4A4A;line-height:1.85}
+.m-stealth__cta{display:inline-block;margin:6px 0 16px;padding:11px 20px;background:#E0407A;color:#fff;font-size:.88rem;font-weight:700;border-radius:4px;text-decoration:none;cursor:pointer}
+.m-stealth__foot{padding-top:12px;border-top:1px solid #EEE;font-size:.7rem;color:#B5B5B5}
+
+/* ---- 14 ゲーム内通貨 ---- */
+.m-coin{background:#171B2E;border-radius:6px;padding:16px;color:#E8EAF6}
+.m-coin__bar{text-align:right;font-size:.78rem;color:#B9BEDB;margin-bottom:14px}
+.m-coin__bar b{color:#FFD54F;font-size:1rem}
+.m-coin__item{display:flex;gap:13px;align-items:center;padding:12px;background:#232849;border-radius:5px}
+.m-coin__thumb{width:66px;height:66px;flex:none;display:flex;align-items:center;justify-content:center;background:#31386B;border-radius:4px;font-size:.62rem;color:#A6ADD8;text-align:center}
+.m-coin__name{margin:0 0 5px;font-size:.9rem;font-weight:700}
+.m-coin__price{margin:0;font-size:1.32rem;font-weight:900;color:#FFD54F}
+.m-coin__cta{display:block;width:100%;margin-top:14px;padding:14px;background:#FFB300;color:#2A2000;font-size:1rem;font-weight:900;border-radius:5px}
+.m-coin__rate{margin:12px 0 0;font-size:.58rem;color:#6E74A0;line-height:1.6}
+
+/* ---- 15 比較妨害 ---- */
+.m-cmp{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.m-cmp__col{padding:14px 10px;border:1px solid #E4E4E4;border-radius:5px;text-align:center}
+.m-cmp__col.is-rec{border-color:#0A66C2;border-width:2px;background:#F5F9FE}
+.m-cmp__n{margin:0 0 8px;font-size:.8rem;font-weight:700;color:#555}
+.m-cmp__p{margin:0 0 10px;font-size:.62rem;color:#777;line-height:1.4}
+.m-cmp__p b{display:block;font-size:1.32rem;color:#0A66C2;font-weight:900}
+.m-cmp__f{margin:0;font-size:.62rem;color:#888;line-height:1.8;text-align:left}
+@media(max-width:520px){.m-cmp{grid-template-columns:1fr;gap:6px}.m-cmp__f{text-align:center}}
+
+/* ---- 16 偽の解約完了 ---- */
+.m-fakedone{text-align:center;padding:8px 0}
+.m-fakedone__mark{width:46px;height:46px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;background:#1DB954;color:#fff;border-radius:50%;font-size:1.5rem}
+.m-fakedone__h{margin:0 0 6px;font-size:1.24rem;font-weight:900;color:#1A1A1A}
+.m-fakedone__sub{margin:0 0 18px;font-size:.84rem;color:#777}
+.m-fakedone__fine{margin:0 0 14px;font-size:.58rem;color:#C9C9C9;line-height:1.6;text-align:left}
+.m-fakedone__cta{display:block;width:100%;padding:13px;background:#F0F0F0;color:#888;font-size:.84rem;font-weight:700;border-radius:4px}
+
+/* ---- 17 依存設計 ---- */
+.m-streak{background:#0F1117;border-radius:6px;padding:16px;color:#E9ECF2}
+.m-streak__flame{display:flex;align-items:baseline;justify-content:center;gap:7px;padding:16px;background:linear-gradient(180deg,#3A1D08,#1A1008);border-radius:6px}
+.m-streak__num{font-size:2.6rem;font-weight:900;color:#FF8A2B;line-height:1}
+.m-streak__lab{font-size:.86rem;color:#D0A87A}
+.m-streak__warn{margin:12px 0;text-align:center;font-size:.84rem;color:#FF6B57}
+.m-streak__warn b{font-size:1rem}
+.m-streak__feed{border-top:1px solid #262A36;padding-top:10px}
+.m-streak__feed p{margin:0 0 6px;padding:11px;background:#181C25;border-radius:4px;font-size:.74rem;color:#7A8291}
+.m-streak__more{text-align:center;color:#4E5666 !important;background:transparent !important}
+
+/* ---- 18 契約縛り ---- */
+.m-lock{text-align:center}
+.m-lock__h{margin:0 0 4px;font-size:1.02rem;font-weight:700;color:#1A1A1A}
+.m-lock__h b{font-size:2.2rem;font-weight:900;color:#D81E06}
+.m-lock__sub{margin:0 0 18px;font-size:.82rem;color:#777}
+.m-lock__cta{display:block;width:100%;padding:16px;background:#D81E06;color:#fff;font-size:1.02rem;font-weight:900;border-radius:4px}
+.m-lock__terms{margin:12px 0 8px;font-size:.66rem;color:#9A9A9A}
+.m-lock__ex{margin:0;padding:9px 11px;background:#FAFAFA;border:1px solid #EEE;font-size:.56rem;color:#C4C4C4;line-height:1.6;text-align:left}
+
+/* ---- 19 健全なクロスセル ---- */
+.m-cross__main{display:flex;justify-content:space-between;padding-bottom:13px;border-bottom:1px solid #EAEAEA;font-size:.92rem}
+.m-cross__h{margin:14px 0 8px;font-size:.82rem;font-weight:700;color:#555}
+.m-cross__opt{display:flex;gap:9px;align-items:center;padding:9px 0;font-size:.86rem;color:#444;cursor:pointer}
+.m-cross__opt input{flex:none;width:16px;height:16px;accent-color:#0A66C2}
+.m-cross__sum{margin:12px 0 14px;padding-top:13px;border-top:2px solid #333;font-size:1.02rem;font-weight:900}
+.m-cross__cta{display:block;width:100%;padding:15px;background:#0A66C2;color:#fff;font-size:.98rem;font-weight:700;border-radius:4px}
+
+/* ---- 20 正当な離脱防止 ---- */
+.m-exit{background:#EFEFEF;padding:24px 14px;border-radius:3px}
+.m-exit__card{max-width:340px;margin:0 auto;background:#fff;padding:22px 20px 16px;border-radius:8px;text-align:center;box-shadow:0 8px 26px rgba(0,0,0,.13)}
+.m-exit__h{margin:0 0 6px;font-size:1.08rem;font-weight:900}
+.m-exit__t{margin:0 0 16px;font-size:.84rem;color:#666}
+.m-exit__btns{display:flex;gap:8px}
+.m-exit__no,.m-exit__yes{flex:1;padding:12px 0;font-size:.86rem;font-weight:700;border-radius:4px}
+.m-exit__no{background:#fff;border:1px solid #C9C9C9;color:#555}
+.m-exit__yes{background:#2C6A4E;color:#fff}
+.m-exit__note{margin:12px 0 0;font-size:.66rem;color:#A5A5A5}
+
+/* 印を付けたとき、ラベルが本文に重なる箇所だけ隙間を確保 */
+.specimen.is-marked .m-coin__price{margin-top:16px}
+.specimen.is-marked .m-coin__rate{margin-top:22px}
+.specimen.is-marked .m-exit__btns{margin-top:20px}
+.specimen.is-marked .m-exit__note{margin-top:20px}
+.specimen.is-marked .m-streak__warn{margin-top:20px}
+.specimen.is-marked .m-cross__sum{margin-top:22px}
+
+/* ===========================================================
+   言語切り替え
+   =========================================================== */
+.lang{
+  position:fixed;
+  top:16px;
+  right:16px;
+  z-index:50;
+  padding:7px 15px;
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:2px;
+  font:inherit;
+  font-size:.76rem;
+  font-weight:700;
+  letter-spacing:.04em;
+  color:var(--ink-2);
+  cursor:pointer;
+  transition:border-color .12s,color .12s;
+}
+.lang:hover{border-color:var(--ink);color:var(--ink)}
+.lang:focus-visible{outline:2px solid var(--signal);outline-offset:3px}
+
+@media(max-width:520px){
+  .lang{top:10px;right:10px;padding:6px 12px;font-size:.7rem}
+  .shell{padding-top:46px}
+}
+
+/* 英語では和文用の詰めを解除する */
+html[lang="en"] body{font-feature-settings:normal}
+html[lang="en"] .title__h{letter-spacing:-.015em}
