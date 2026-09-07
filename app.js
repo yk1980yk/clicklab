@@ -542,6 +542,23 @@
       });
     });
 
+    /* 開閉の見出し。閉じているものが開くと分かる形にしておく */
+    document.querySelectorAll('[data-sms-toggle]').forEach(function (btn) {
+      var box = btn.closest('.smsbox');
+      var body = box.querySelector('[data-sms-body]');
+      var label = btn.querySelector('[data-sms-label]');
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      label.textContent = open ? T('smsClose') : T('smsOpen');
+      if (btn.dataset.wired) return;
+      btn.dataset.wired = '1';
+      btn.addEventListener('click', function () {
+        var now = btn.getAttribute('aria-expanded') !== 'true';
+        btn.setAttribute('aria-expanded', String(now));
+        body.hidden = !now;
+        label.textContent = now ? T('smsClose') : T('smsOpen');
+      });
+    });
+
     var lb = $('btn-lang');
     lb.textContent = T('langSwitch');
     lb.setAttribute('aria-label', T('langSwitchLabel'));

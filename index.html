@@ -50,10 +50,15 @@
     <p class="note-reg" data-i18n="noteReg"></p>
 
     <div class="smsbox">
-      <p class="smsbox__h" data-i18n="smsH"></p>
-      <p class="smsbox__lead" data-i18n="smsLead"></p>
-      <div class="smsbox__grid" data-sms></div>
-      <p class="smsbox__hint" data-i18n="smsHint"></p>
+      <button class="smsbox__toggle" data-sms-toggle aria-expanded="false">
+        <span class="smsbox__h" data-i18n="smsH"></span>
+        <span class="smsbox__more" data-sms-label></span>
+      </button>
+      <div class="smsbox__body" data-sms-body hidden>
+        <p class="smsbox__lead" data-i18n="smsLead"></p>
+        <div class="smsbox__grid" data-sms></div>
+        <p class="smsbox__hint" data-i18n="smsHint"></p>
+      </div>
     </div>
 
     <div class="modes">
@@ -199,10 +204,15 @@
     <div id="help-body"></div>
 
     <div class="smsbox smsbox--help">
-      <p class="smsbox__h" data-i18n="smsH"></p>
-      <p class="smsbox__lead" data-i18n="smsLead"></p>
-      <div class="smsbox__grid" data-sms></div>
-      <p class="smsbox__hint" data-i18n="smsHint"></p>
+      <button class="smsbox__toggle" data-sms-toggle aria-expanded="false">
+        <span class="smsbox__h" data-i18n="smsH"></span>
+        <span class="smsbox__more" data-sms-label></span>
+      </button>
+      <div class="smsbox__body" data-sms-body hidden>
+        <p class="smsbox__lead" data-i18n="smsLead"></p>
+        <div class="smsbox__grid" data-sms></div>
+        <p class="smsbox__hint" data-i18n="smsHint"></p>
+      </div>
     </div>
     <p class="help__note" data-i18n="helpNote"></p>
     <p class="help__disc" data-i18n="helpDisclaimer"></p>

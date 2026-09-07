@@ -1407,3 +1407,43 @@ html[lang="en"] .title__h{letter-spacing:-.015em}
   .title__h{font-size:clamp(1.9rem,7.2vw,3.1rem)}
   .title__over{margin-bottom:20px}
 }
+
+/* ---- 実際に届く例は畳んでおく ----
+   閉じていることが分かり、開けることも分かる形にする */
+.smsbox__toggle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  width:100%;
+  padding:0;
+  background:none;
+  border:none;
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
+}
+.smsbox__toggle:focus-visible{outline:2px solid var(--signal);outline-offset:4px}
+.smsbox__toggle .smsbox__h{margin:0}
+.smsbox__more{
+  flex:none;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 13px;
+  background:var(--white);
+  border:1px solid var(--signal);
+  border-radius:2px;
+  font-size:.76rem;
+  font-weight:700;
+  color:var(--signal);
+  white-space:nowrap;
+}
+.smsbox__more::after{content:'＋';font-size:.8rem;line-height:1}
+.smsbox__toggle[aria-expanded="true"] .smsbox__more::after{content:'−'}
+.smsbox__toggle:hover .smsbox__more{background:var(--signal);color:#fff}
+.smsbox__body{margin-top:18px}
+
+@media(max-width:520px){
+  .smsbox__toggle{flex-direction:column;align-items:flex-start;gap:10px}
+}

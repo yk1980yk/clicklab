@@ -105,6 +105,8 @@ ja: {
   smsH: '実際には、こんな形で届きます',
   smsLead: 'いずれも架空の名前です。共通しているのは、心当たりのある用件で、住所を踏ませようとする点。差出人の名前ではなく、住所と、その用件に心当たりがあるかで判断します。',
   smsHint: '触れると、見分けどころが出ます',
+  smsOpen: '4通の例を見る',
+  smsClose: '閉じる',
   smsItems: [
     { from: '+81 90-0000-0000', time: '今日 12:32',
       body: '【みなと信用銀行】お客様がご利用の口座が不正利用されている可能性があります。口座一時利用停止：',
@@ -275,6 +277,8 @@ en: {
   smsH: 'This is the shape they arrive in',
   smsLead: 'Every name here is invented. What they share: a subject you plausibly have business with, and a link to press. Judge by the address and whether you were expecting this — not by the name at the top.',
   smsHint: 'Tap one to see what gives it away',
+  smsOpen: 'See four examples',
+  smsClose: 'Close',
   smsItems: [
     { from: '+1 555-000-0000', time: 'Today 12:32',
       body: '[Harbour Trust Bank] We have detected possible unauthorised use of your account. Suspend account access here:',
