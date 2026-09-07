@@ -72,15 +72,37 @@ body{
    =========================================================== */
 .screen--title{padding-top:24px}
 
+/* サービス名。押せそうに見えるが、押しても何も起きない。
+   「クリック」を掲げている以上、ここだけは触れる形にしておく */
 .title__over{
-  margin:0 0 28px;
-  font-size:.8rem;
+  display:inline-block;
+  margin:0 0 26px;
+  padding:7px 15px;
+  background:var(--white);
+  border:1px solid var(--ink);
+  border-radius:3px;
+  box-shadow:0 2px 0 var(--ink);
+  font-size:.78rem;
   font-weight:700;
-  letter-spacing:.22em;
-  color:var(--ink-2);
+  letter-spacing:.18em;
+  color:var(--ink);
+  cursor:pointer;
+  user-select:none;
+  transition:transform .08s,box-shadow .08s,background .12s;
+}
+.title__over:hover{background:var(--paper-2)}
+.title__over:active{transform:translateY(2px);box-shadow:0 0 0 var(--ink)}
+
+/* 見出しは検体と同じく枠に載せる */
+.title__frame{
+  margin:0 0 26px;
+  padding:26px 26px 28px;
+  background:var(--white);
+  border:1px solid var(--line);
+  border-left:3px solid var(--ink);
 }
 .title__h{
-  margin:0 0 28px;
+  margin:0;
   font-size:clamp(2.1rem,8vw,3.1rem);
   font-weight:900;
   line-height:1.28;
@@ -507,11 +529,14 @@ body{
 
 /* --- モバイルは3枚に絞る --- */
 @media(max-width:639px){
-  .scatter{height:212px;margin:28px 0 4px}
-  .chip--badge,.chip--social,.chip--fine{display:none}
-  .chip--timer{left:2%;  top:4px;   transform:rotate(-4deg);font-size:1.4rem;padding:10px 15px}
-  .chip--cta{  left:26%; top:78px;  transform:rotate(3deg); font-size:.98rem;padding:14px 24px}
-  .chip--shame{left:8%;  top:160px; transform:rotate(-2deg)}
+  /* 6枚のまま縦に散らす。枚数を減らすと種類の少なさが印象に残るため */
+  .scatter{height:430px;margin:26px 0 4px}
+  .chip--badge{ left:4%;  top:0;     transform:rotate(-8deg)}
+  .chip--timer{ left:26%; top:34px;  transform:rotate(4deg); font-size:1.35rem;padding:10px 15px}
+  .chip--social{left:6%;  top:130px; transform:rotate(-3deg);font-size:.74rem;padding:7px 12px}
+  .chip--cta{   left:34%; top:186px; transform:rotate(3deg); font-size:.96rem;padding:13px 22px}
+  .chip--fine{  left:3%;  top:268px; transform:rotate(-2deg);max-width:74vw;font-size:.62rem}
+  .chip--shame{ left:22%; top:362px; transform:rotate(4deg); font-size:.74rem}
 }
 
 @media(prefers-reduced-motion:reduce){
@@ -1374,4 +1399,11 @@ html[lang="en"] .title__h{letter-spacing:-.015em}
 @media(max-width:520px){
   .smsbox{padding:18px 18px}
   .sms::after{font-size:.6rem;max-width:70vw;overflow:hidden;text-overflow:ellipsis}
+}
+
+/* 見出しの枠が入ったぶん、狭い画面では文字幅を確保する */
+@media(max-width:639px){
+  .title__frame{padding:20px 16px 22px}
+  .title__h{font-size:clamp(1.9rem,7.2vw,3.1rem)}
+  .title__over{margin-bottom:20px}
 }
