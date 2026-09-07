@@ -4,6 +4,170 @@
    =========================================================== */
 window.STAGES_EN = {
 
+4: {
+  title: 'A warning appears out of nowhere',
+  category: 'Fraud',
+  url: 'news-digest.example/article/4471',
+  mock: `
+    <div class="m-scare">
+      <div class="m-scare__page">
+        <p class="m-scare__ptitle">This week in technology</p>
+        <p class="m-scare__ptext">Reaction to the standard announced last week has been divided across the industry...</p>
+      </div>
+      <div class="m-scare__modal">
+        <div class="m-scare__bar" data-trap="dark" data-label="Dressed as a system message">⚠　SECURITY ALERT</div>
+        <div class="m-scare__body">
+          <p class="m-scare__h"><b>3 threats</b> detected on this device</p>
+          <ul class="m-scare__list">
+            <li>Trojan.Win32.Generic</li>
+            <li>Adware.Tracking.Cookie</li>
+            <li>PUP.Optional.Bundler</li>
+          </ul>
+          <p class="m-scare__timer" data-trap="dark" data-label="Removes time to think">Removal window closes in <b>04:58</b></p>
+          <button class="m-scare__cta">Remove threats now</button>
+          <p class="m-scare__tel" data-trap="dark" data-label="Getting you to call is the point">Support line 1-800-000-0000 (24 hours)</p>
+        </div>
+      </div>
+    </div>`,
+  question: 'You were reading an article and this appeared. What do you do?',
+  choices: [
+    { text: 'Call the number shown and find out what is going on',
+      feedback: 'That number is the destination. Calls lead to remote-access software being installed, or a support fee being charged.' },
+    { text: 'Close the tab. If it will not close, quit the browser',
+      feedback: 'Correct. This is only part of a web page, so closing it leaves nothing behind.' },
+    { text: 'Run a scan with your own security software, just in case',
+      feedback: 'No harm in it, and a cautious instinct. It will find nothing, though. Recognising this as an advert gets you there faster.' }
+  ],
+  patternName: 'Scareware',
+  psychology: 'Fear halts deliberation — once people feel endangered, they follow instructions',
+  explanation:
+    'A web page cannot inspect your device, which means it cannot detect an infection either. It looks convincing because the colours mimic a system alert, the malware names sound plausible, and a countdown is running. The goal is not removal — it is getting you on the phone and granting remote access.',
+  checks: [
+    'A warning inside a browser window is not a warning from your device',
+    'Genuine security software does not put a phone number in an alert',
+    'If it will not close, quit the browser entirely'
+  ]
+},
+
+10: {
+  title: 'A missed delivery message',
+  category: 'Fraud',
+  url: 'SMS (from +1 555-000-0000)',
+  mock: `
+    <div class="m-sms">
+      <div class="m-sms__head">
+        <span class="m-sms__from" data-trap="dark" data-label="Number not in your contacts">+1 555-000-0000</span>
+        <span class="m-sms__time">Today 14:32</span>
+      </div>
+      <div class="m-sms__bubble">
+        <p>We attempted delivery of your parcel today but nobody was available.</p>
+        <p>Reschedule here&nbsp;<span class="m-sms__link" data-trap="dark" data-label="Not the official address">https://parcel-redelivery-check.xyz/re</span></p>
+        <p class="m-sms__sign">* Please confirm before end of day</p>
+      </div>
+      <div class="m-sms__prev">
+        <p class="m-sms__old">[Yesterday] Your subscription order has shipped</p>
+      </div>
+    </div>`,
+  question: 'You are expecting a parcel. This message arrives.',
+  choices: [
+    { text: 'Open the link and rearrange the delivery',
+      feedback: 'The message is false, but the situation is true. That overlap is what removes the doubt.' },
+    { text: 'Ignore the link and check through the carrier app or your tracking number',
+      feedback: 'Correct. Never follow the thing that arrived — go in through an entrance you already know.' },
+    { text: 'Open the link and check the address is right before entering anything',
+      feedback: 'That is the wrong order. Checking the address happens before opening it; by the time it loads, it has loaded.' }
+  ],
+  patternName: 'Phishing',
+  psychology: 'Situational fit — a false message stops feeling false when your circumstances match it',
+  explanation:
+    'This works because a great many people are waiting on a parcel at any moment. Sent indiscriminately, a fraction land on someone who was genuinely expecting one. The address resembles the real carrier but the ending does not match. The line urging you to act today exists to remove the pause in which you would have checked.',
+  checks: [
+    'Never follow the link, even from a carrier you recognise',
+    'Enter the tracking number yourself on the official site',
+    'Treat unfamiliar endings (.xyz, .top) and shortened links as suspect'
+  ]
+},
+
+16: {
+  title: 'Opening a shared file',
+  category: 'Fraud',
+  url: 'opened from a link in an email',
+  mock: `
+    <div class="m-phish">
+      <div class="m-phish__urlbar" data-trap="dark" data-label="Look closely at the spelling">
+        <span class="m-phish__lock">🔒</span> https://d0cbox-share.com/login
+      </div>
+      <div class="m-phish__body">
+        <p class="m-phish__logo">DocBox</p>
+        <p class="m-phish__lead" data-trap="dark" data-label="The reason to sign in is supplied first">Sign in to view the file that has been shared with you</p>
+        <p class="m-phish__file">📄 FY2026_Budget_FINAL.xlsx</p>
+        <input class="m-phish__in" placeholder="Email address" readonly>
+        <input class="m-phish__in" placeholder="Password" type="password" readonly>
+        <button class="m-phish__cta">Sign in</button>
+        <p class="m-phish__or">or</p>
+        <button class="m-phish__sso">Sign in with another account</button>
+        <p class="m-phish__foot">Privacy　Terms　Help</p>
+      </div>
+    </div>`,
+  question: 'A colleague sent a shared link, and opening it produced this screen.',
+  choices: [
+    { text: 'Enter your email and password — you use this service every day',
+      feedback: 'It looks right. But the "o" in the address is a zero. What you type goes to whoever built the page.' },
+    { text: 'Read the address. If anything is off, do not type, and open the service directly instead',
+      feedback: 'Correct. If a file really has been shared, signing in through the real site will show it.' },
+    { text: 'Avoid typing a password and use "Sign in with another account" instead',
+      feedback: 'It feels safer, but if this page is fake then so is whatever it shows next. The address decides this, not the button.' }
+  ],
+  patternName: 'Credential harvesting',
+  psychology: 'Pretext supplied in advance — a reason to sign in is waiting before you ask for one',
+  explanation:
+    'Copying the appearance of a login screen is trivial. The address is the only thing that settles it, and here an "o" has been replaced with a zero. The file name is deliberately specific and plausible for a workplace: the more you want to see inside, the later you get around to reading the address.',
+  checks: [
+    'When a login screen appears, read the address to the end before anything else',
+    'Reopen the service from your own bookmark or a search, not from the message',
+    'If your password manager declines to autofill, treat that as the address being wrong'
+  ]
+},
+
+21: {
+  title: 'An update you did not ask for',
+  category: 'Fraud',
+  url: 'free-movie-stream.example/watch',
+  mock: `
+    <div class="m-fakeup">
+      <div class="m-fakeup__page">
+        <p class="m-fakeup__ptitle">This video could not be played</p>
+      </div>
+      <div class="m-fakeup__dialog" data-trap="dark" data-label="It is inside the page">
+        <p class="m-fakeup__h">A system update is required</p>
+        <p class="m-fakeup__t">A component needed for playback is out of date. This update contains important security fixes.</p>
+        <div class="m-fakeup__meta" data-trap="dark" data-label="No publisher named">Version 118.0.2 / 12.4 MB</div>
+        <div class="m-fakeup__btns">
+          <button class="m-fakeup__later">Later</button>
+          <button class="m-fakeup__now">Update now</button>
+        </div>
+      </div>
+    </div>`,
+  question: 'This appeared while you were browsing. What do you do?',
+  choices: [
+    { text: 'Install it — it says the update contains security fixes',
+      feedback: 'What downloads is not an update. Running it is the moment your device is handed over.' },
+    { text: 'Close it, and check whether an update exists in your device settings',
+      feedback: 'Correct. Real updates come from your device settings, never from inside a web page.' },
+    { text: 'Press "Later" and look into it when you have time',
+      feedback: 'Reasonable. But "Later" is also their button — closing the tab outright is the surer move.' }
+  ],
+  patternName: 'Fake update',
+  psychology: 'Exploiting habit — system notifications are the ones we do not question',
+  explanation:
+    'The giveaway is not the wording but the location. Device and browser update notices never appear inside a web page. If it is in the page, it is an advert or a route to an executable file. The absence of a named publisher is a second signal.',
+  checks: [
+    'An update notice inside a web page is not a notice from your device',
+    'Update only through device settings or the official site',
+    'If a site requires extra software to show you something, leave the site'
+  ]
+},
+
 1: {
   title: 'The one-day-only countdown',
   category: 'Urgency',
@@ -55,12 +219,43 @@ window.STAGES_EN = {
   category: 'Subscriptions',
   url: 'studyflow.example/trial',
   mock: `
-    <div class="m-trial">
-      <h3 class="m-trial__h">Unlimited Learning</h3>
-      <p class="m-trial__lead">3,000 courses. Start free.</p>
-      <button class="m-trial__cta" data-trap="dark" data-label="Only the entrance is loud">Try free for 1 month</button>
-      <p class="m-trial__sub">Credit card required</p>
-      <p class="m-trial__fine" data-trap="dark" data-label="The exit is folded in here">* At the end of the trial your account converts automatically to the paid plan at $79/month. Cancellations are accepted by telephone only, no later than 10 days before your renewal date, weekdays 10:00–11:00. We do not process cancellations by post or online.</p>
+    <div class="m-lp">
+      <div class="m-lp__nav">
+        <span class="m-lp__logo">StudyFlow</span>
+        <span class="m-lp__navlinks">Courses&nbsp;&nbsp;Pricing&nbsp;&nbsp;For teams&nbsp;&nbsp;Log in</span>
+      </div>
+      <div class="m-lp__hero">
+        <p class="m-lp__eyebrow">ONLINE LEARNING</p>
+        <p class="m-lp__h">3,000 courses, wherever you are</p>
+        <p class="m-lp__sub">Video, exercises and feedback, all in one place.</p>
+        <button class="m-lp__cta" data-trap="dark" data-label="Only the entrance is loud">Try free for 1 month</button>
+        <p class="m-lp__ctasub">Credit card required</p>
+      </div>
+      <div class="m-lp__stats">
+        <span><b>3,204</b>courses</span><span><b>180k</b>learners</span><span><b>4.6</b>average rating</span>
+      </div>
+      <div class="m-lp__sec">
+        <p class="m-lp__sech">WHAT YOU GET</p>
+        <div class="m-lp__feat"><b>Watch</b>Ten-minute lessons that fit into a commute.</div>
+        <div class="m-lp__feat"><b>Practise</b>Exercises after every chapter, marked instantly.</div>
+        <div class="m-lp__feat"><b>Get feedback</b>Instructors comment on the work you submit.</div>
+      </div>
+      <div class="m-lp__sec">
+        <p class="m-lp__sech">FROM OUR LEARNERS</p>
+        <p class="m-lp__voice">Thirty minutes each morning, and six months later I changed jobs<span>Marcus, 28</span></p>
+        <p class="m-lp__voice">Being able to ask when I got stuck made the difference<span>Priya, 34</span></p>
+      </div>
+      <div class="m-lp__sec">
+        <p class="m-lp__sech">COMMON QUESTIONS</p>
+        <p class="m-lp__faq"><b>Can I use this on my phone?</b>Yes, there is an app for iOS and Android.</p>
+        <p class="m-lp__faq"><b>Are new courses added?</b>Around twenty every month.</p>
+      </div>
+      <button class="m-lp__cta m-lp__cta--again">Try free for 1 month</button>
+      <div class="m-lp__foot">
+        <p class="m-lp__footlinks">About&nbsp;&nbsp;Terms&nbsp;&nbsp;Privacy&nbsp;&nbsp;Cookies&nbsp;&nbsp;Contact</p>
+        <p class="m-lp__fine" data-trap="dark" data-label="The exit is folded in here">* At the end of the trial your account converts automatically to the paid plan at $79/month. Cancellations are accepted by telephone only, no later than 10 days before your renewal date, weekdays 10:00-11:00. We do not process cancellations by post or online.</p>
+        <p class="m-lp__copy">© StudyFlow</p>
+      </div>
     </div>`,
   question: 'You are about to press “Try free for 1 month”. What do you do next?',
   choices: [
@@ -119,7 +314,7 @@ window.STAGES_EN = {
   ]
 },
 
-4: {
+5: {
   title: 'One click from confirming',
   category: 'Defaults',
   url: 'bookdrop.example/cart/checkout',
@@ -159,19 +354,39 @@ window.STAGES_EN = {
   ]
 },
 
-5: {
+6: {
   title: 'Choosing a plan',
   category: 'Visual',
   url: 'lumipic.example/signup/plan',
   mock: `
-    <div class="m-plan">
-      <h3 class="m-plan__h">Choose your plan</h3>
-      <button class="m-plan__paid" data-trap="dark" data-label="Only one side is made visible">
-        Go Premium
-        <span class="m-plan__paidSub">$12/month / no ads</span>
-      </button>
-      <div class="m-plan__row">
-        <span class="m-plan__ghost" data-trap="dark" data-label="The exit, blended into the page">Continue with the free plan</span>
+    <div class="m-plan2">
+      <div class="m-lp__nav">
+        <span class="m-lp__logo">Lumipic</span>
+        <span class="m-lp__navlinks">Help</span>
+      </div>
+      <div class="m-plan2__body">
+        <p class="m-plan2__step">One step left</p>
+        <p class="m-plan2__h">Choose your plan</p>
+        <div class="m-plan2__card">
+          <p class="m-plan2__badge">RECOMMENDED</p>
+          <p class="m-plan2__name">Premium</p>
+          <p class="m-plan2__price">$<b>12</b>/month</p>
+          <ul class="m-plan2__list">
+            <li>Browse without ads</li>
+            <li>Unlimited photo storage</li>
+            <li>Full-resolution downloads</li>
+            <li>Priority support</li>
+          </ul>
+          <button class="m-plan2__paid" data-trap="dark" data-label="Only one side is made visible">Go Premium</button>
+          <p class="m-plan2__note">Cancel any time</p>
+        </div>
+        <div class="m-plan2__row">
+          <span class="m-plan2__ghost" data-trap="dark" data-label="The exit, blended into the page">Continue with the free plan</span>
+        </div>
+      </div>
+      <div class="m-lp__foot">
+        <p class="m-lp__footlinks">About&nbsp;&nbsp;Terms&nbsp;&nbsp;Privacy&nbsp;&nbsp;Contact</p>
+        <p class="m-lp__copy">© Lumipic</p>
       </div>
     </div>`,
   question: 'You want to keep using the free version. What do you press?',
@@ -194,7 +409,7 @@ window.STAGES_EN = {
   ]
 },
 
-6: {
+7: {
   title: 'Holding a seat',
   category: 'Judging legitimacy',
   url: 'ticket-gate.example/seat/hold',
@@ -233,7 +448,7 @@ window.STAGES_EN = {
   }
 },
 
-7: {
+8: {
   title: 'Turning down a coupon',
   category: 'Emotion',
   url: 'modeclip.example/campaign',
@@ -241,23 +456,23 @@ window.STAGES_EN = {
     <div class="m-shame">
       <div class="m-shame__card">
         <p class="m-shame__h">$10 off your first order</p>
-        <button class="m-shame__yes">Yes, take $10 off my order</button>
-        <p class="m-shame__no" data-trap="dark" data-label="Shame attached to declining">No thanks, I enjoy paying full price and wasting money</p>
+        <button class="m-shame__yes">Yes, I want to look my best</button>
+        <p class="m-shame__no" data-trap="dark" data-label="Shame attached to declining">No thanks, I'm fine the way I am</p>
       </div>
     </div>`,
   question: 'How do you read this, and what do you do?',
   choices: [
-    { text: 'Nobody likes losing money — use the coupon and buy',
+    { text: 'Buy while the discount is on the table',
       feedback: 'A purchase made to avoid a bad feeling. Whether you need the product never entered into it.' },
     { text: 'Recognise the nudge for what it is and decline if you do not want it',
       feedback: 'Correct. The feeling attached to the button has been separated from the decision.' },
-    { text: 'Feel a bit foolish about turning it down',
-      feedback: 'That feeling is the designed output. Declining is not foolish.' }
+    { text: 'The wording is unpleasant, but the discount is real — use it if you want the product',
+      feedback: 'Reasonable enough. Worth checking whether \u201cif you want it\u201d still means the same thing after reading that line.' }
   ],
   patternName: 'Confirmshaming',
   psychology: 'People avoid options that make them feel bad about themselves',
   explanation:
-    'The act of declining is fused to a statement about your own poor judgement. To say no, you must first agree that you are careless with money. The price tag is emotional and it is attached to the button, not to the product.',
+    'Declining is fused to a statement about yourself. The line reads as gentle until you try to press it — few people can say they are entirely fine as they are. The question you are answering is no longer whether you want the product.',
   checks: [
     'Emotive wording on a decline button is staging, not information',
     'Return to the only question that matters: do you want the thing',
@@ -265,7 +480,7 @@ window.STAGES_EN = {
   ]
 },
 
-8: {
+9: {
   title: 'Far below the going rate',
   category: 'Credibility',
   url: 'marketnest.example/item/8842190',
@@ -283,12 +498,12 @@ window.STAGES_EN = {
     </div>`,
   question: 'You find something far below the going rate. What do you check first?',
   choices: [
-    { text: 'Buy immediately — it will sell out',
-      feedback: 'The price takes your attention and the line at the bottom of the description goes unread.' },
+    { text: 'Buy it — you can always return it if it is not what you expected',
+      feedback: 'Returns have deadlines and conditions, and this seller can point to a line in the description. In a dispute that line favours them.' },
     { text: 'Read the full description and any notes, to the end',
       feedback: 'Correct. This listing stated that the console itself was not included.' },
-    { text: 'Trust it — the photo looks genuine',
-      feedback: 'The photo was of the console. Nothing guarantees the photo matches what ships.' }
+    { text: 'Trust it — the seller has a high rating and plenty of feedback',
+      feedback: 'That reputation may have been built on other products. A seller\u2019s record and the contents of this listing are separate things.' }
   ],
   patternName: 'Trick wording',
   psychology: 'Anchoring — the first number becomes the reference point and scrutiny drops',
@@ -301,7 +516,7 @@ window.STAGES_EN = {
   ]
 },
 
-9: {
+11: {
   title: 'The road out',
   category: 'Subscriptions',
   url: 'flowbox.example/account/cancel',
@@ -330,8 +545,8 @@ window.STAGES_EN = {
       feedback: 'That is the design working. The same screens will be waiting, and the charges continue in the meantime.' },
     { text: 'Keep choosing “continue” until you reach a completion screen',
       feedback: 'Correct. Nothing is cancelled until you have both the completion screen and the confirmation email.' },
-    { text: 'Close the tab — it will cancel automatically',
-      feedback: 'An abandoned process is void. The subscription continues to the next billing date.' }
+    { text: 'Contact support and ask them to cancel it for you',
+      feedback: 'Sometimes this works, but billing continues while you wait for a reply. Finishing the process in front of you is faster and more certain.' }
   ],
   patternName: 'Obstruction / Hard to cancel',
   psychology: 'Decision fatigue — every extra step increases the chance of giving up',
@@ -344,7 +559,7 @@ window.STAGES_EN = {
   ]
 },
 
-10: {
+12: {
   title: 'Two rooms left',
   category: 'Judging legitimacy',
   url: 'stayfinder.example/hotel/lisbon-1024',
@@ -381,7 +596,7 @@ window.STAGES_EN = {
   ]
 },
 
-11: {
+13: {
   title: 'A quiz app wants your contacts',
   category: 'Privacy',
   url: 'app: Personality Decoder',
@@ -402,8 +617,8 @@ window.STAGES_EN = {
       feedback: 'Showing you a quiz result needs no contacts. The sentence merely makes it sound necessary.' },
     { text: 'Refuse, and delete the app if it keeps asking',
       feedback: 'Correct. Repeated asking after a refusal is itself evidence that collection is the goal.' },
-    { text: 'Allow it — contact data is harmless',
-      feedback: 'You are not only handing over your own information. Everyone in your address book comes with it.' }
+    { text: 'Allow it now and revoke the permission in settings afterwards',
+      feedback: 'A reasonable move, but the read often happens the instant you allow it. Revoking later does not bring back what was already sent.' }
   ],
   patternName: 'Forced action / Nagging',
   psychology: 'Substituted purpose — your wish to use the app is used to extract something unrelated',
@@ -416,7 +631,7 @@ window.STAGES_EN = {
   ]
 },
 
-12: {
+14: {
   title: 'Ranked number one',
   category: 'Credibility',
   url: 'glowcare.example/product/serum',
@@ -454,7 +669,7 @@ window.STAGES_EN = {
   ]
 },
 
-13: {
+15: {
   title: 'An honest review',
   category: 'Credibility',
   url: 'dailynote.example/review/serum',
@@ -473,8 +688,8 @@ window.STAGES_EN = {
       feedback: 'The moment you read it as a stranger\u2019s opinion, your guard drops. That is the purpose of the format.' },
     { text: 'Check the whole page for an ad, sponsored or paid-partnership disclosure',
       feedback: 'Correct. If none exists, you can reread the piece assuming it is advertising.' },
-    { text: 'Assume a personal blog is not corporate advertising',
-      feedback: 'Anyone can build something that looks like a blog. The format tells you nothing.' }
+    { text: 'Check a few other sites to see whether the product is well reviewed elsewhere',
+      feedback: 'Useful, though the same advertiser may be placing pieces across several sites. Checking this page for a disclosure is faster.' }
   ],
   patternName: 'Disguised ads',
   psychology: 'Advertising gets discounted; a stranger\u2019s opinion does not',
@@ -487,7 +702,7 @@ window.STAGES_EN = {
   ]
 },
 
-14: {
+17: {
   title: 'Buying with game currency',
   category: 'Pricing',
   url: 'app: Starling Saga',
@@ -510,8 +725,8 @@ window.STAGES_EN = {
       feedback: 'If 1 G felt like one cent, the display did its job. The real figure is $14.40.' },
     { text: 'Convert it to real money before deciding',
       feedback: 'Correct. 1,200 G is $14.40 — and since G only sells in blocks of 1,000, you will be left holding a remainder.' },
-    { text: 'Nothing — it is in-game currency',
-      feedback: 'The screen states it is a paid currency. You are spending money you already converted.' }
+    { text: 'Nothing extra — the 3,000 G balance already covers it',
+      feedback: 'True, nothing more to pay today. But that balance was bought with money, and the 1,800 G left over can only be topped up in blocks of 1,000.' }
   ],
   patternName: 'Currency Confusion',
   psychology: 'Put one unit between people and money and the sting of spending fades',
@@ -524,7 +739,7 @@ window.STAGES_EN = {
   ]
 },
 
-15: {
+18: {
   title: 'Three plans, three prices',
   category: 'Pricing',
   url: 'workflow-hub.example/pricing',
@@ -566,7 +781,7 @@ window.STAGES_EN = {
   ]
 },
 
-16: {
+19: {
   title: 'The last cancellation screen',
   category: 'Subscriptions',
   url: 'flowbox.example/account/cancel/done',
@@ -598,7 +813,7 @@ window.STAGES_EN = {
   ]
 },
 
-17: {
+20: {
   title: 'Your streak is about to break',
   category: 'Attention',
   url: 'app: Daily Leaf',
@@ -634,7 +849,7 @@ window.STAGES_EN = {
   ]
 },
 
-18: {
+23: {
   title: 'Twelve dollars a month',
   category: 'Subscriptions',
   url: 'moviegate.example/join',
@@ -652,8 +867,8 @@ window.STAGES_EN = {
       feedback: 'A monthly figure says nothing at all about how long you are committed.' },
     { text: 'The minimum term and any early termination fee, before signing up',
       feedback: 'Correct. With a 24-month lock-in this is a $288 commitment.' },
-    { text: 'Sign up first and read the terms afterwards',
-      feedback: 'Signing up is the agreement. The order is the wrong way round.' }
+    { text: 'The terms are long — check the key points in the FAQ instead',
+      feedback: 'A realistic approach, but conditions do get left out of FAQs. Searching the terms for \u201ctermination fee\u201d is more reliable.' }
   ],
   patternName: 'Hidden subscription',
   psychology: 'A small monthly number conceals the size of the whole commitment',
@@ -666,7 +881,7 @@ window.STAGES_EN = {
   ]
 },
 
-19: {
+22: {
   title: 'Anything else with that?',
   category: 'Judging legitimacy',
   url: 'gadget-lane.example/cart',
@@ -695,7 +910,7 @@ window.STAGES_EN = {
   patternName: 'Legitimate cross-sell',
   psychology: 'What separates an offer from manufactured consent is where the default sits',
   explanation:
-    'This screen looks a great deal like specimen 4. The difference is the initial state. There the boxes were ticked and leaving them counted as agreement; here they are empty and excluded from the total. Showing related products is simply saving the customer a search.',
+    'This screen looks a great deal like specimen 5. The difference is the initial state. There the boxes were ticked and leaving them counted as agreement; here they are empty and excluded from the total. Showing related products is simply saving the customer a search.',
   checks: [
     'Check whether anything arrives pre-ticked',
     'Check whether the suggested items are already in the total',
@@ -703,7 +918,7 @@ window.STAGES_EN = {
   ]
 },
 
-20: {
+24: {
   title: 'On the way out',
   category: 'Judging legitimacy',
   url: 'aoyama-roast.example/cart',

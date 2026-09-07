@@ -49,25 +49,43 @@
 
     <p class="note-reg" data-i18n="noteReg"></p>
 
+    <div class="smsbox">
+      <p class="smsbox__h" data-i18n="smsH"></p>
+      <p class="smsbox__lead" data-i18n="smsLead"></p>
+      <div class="smsbox__grid" data-sms></div>
+      <p class="smsbox__hint" data-i18n="smsHint"></p>
+    </div>
+
     <div class="modes">
       <button class="mode" data-mode="detect">
         <span class="mode__tag mode__tag--d" data-i18n="modeDetectTag"></span>
         <span class="mode__h" data-i18n="modeDetectH"></span>
         <span class="mode__t" data-i18n="modeDetectT"></span>
-        <span class="mode__meta" data-i18n="modeDetectMeta"></span>
+        <span class="mode__foot">
+          <span class="mode__meta" data-i18n="modeDetectMeta"></span>
+          <span class="mode__go" data-i18n="modeStart"></span>
+        </span>
+        <span class="mode__resume" id="resume-detect" hidden></span>
       </button>
       <button class="mode" data-mode="design">
         <span class="mode__tag mode__tag--g" data-i18n="modeDesignTag"></span>
         <span class="mode__h" data-i18n="modeDesignH"></span>
         <span class="mode__t" data-i18n="modeDesignT"></span>
-        <span class="mode__meta" data-i18n="modeDesignMeta"></span>
+        <span class="mode__foot">
+          <span class="mode__meta" data-i18n="modeDesignMeta"></span>
+          <span class="mode__go" data-i18n="modeStart"></span>
+        </span>
+        <span class="mode__resume" id="resume-design" hidden></span>
       </button>
     </div>
 
     <p class="title__fine">
       <span data-i18n="fictional"></span><br>
-      <span id="source-note"></span>
+      <span id="source-note"></span><br>
+      <span data-i18n="privacy"></span>
     </p>
+
+    <p class="help-entry"><button class="help-entry__btn" data-help data-i18n="helpLink"></button></p>
 
     <footer class="credit">
       <p class="credit__t" data-i18n="creditT"></p>
@@ -83,6 +101,10 @@
         <span id="bar-count"></span>
         <span id="bar-score"></span>
       </div>
+      <div class="exit">
+        <button class="exit__btn" data-i18n="backTop"></button>
+        <span class="exit__note" data-i18n="backNote"></span>
+      </div>
     </header>
 
     <h2 class="stage__h"><span class="stage__no" id="stage-no">01</span><span id="stage-title"></span></h2>
@@ -94,6 +116,7 @@
       </figcaption>
       <div class="specimen__view" id="mock"></div>
     </figure>
+    <p class="scroll-hint" id="scroll-hint" data-i18n="scrollHint" hidden></p>
 
     <button class="btn btn--demo" id="btn-demo" hidden></button>
     <p class="demo-result" id="demo-result" hidden></p>
@@ -126,6 +149,10 @@
       <div class="bar__meta">
         <span id="c-count"></span>
         <span id="c-score"></span>
+      </div>
+      <div class="exit">
+        <button class="exit__btn" data-i18n="backTop"></button>
+        <span class="exit__note" data-i18n="backNote"></span>
       </div>
     </header>
 
@@ -164,6 +191,24 @@
     </div>
   </section>
 
+  <!-- ============ 引っかかってしまったときに ============ -->
+  <section class="screen screen--help" id="screen-help" hidden>
+    <p class="title__over" data-i18n="helpOver"></p>
+    <h1 class="help__h" data-i18n-html="helpH"></h1>
+    <p class="help__lead" data-i18n="helpLead"></p>
+    <div id="help-body"></div>
+
+    <div class="smsbox smsbox--help">
+      <p class="smsbox__h" data-i18n="smsH"></p>
+      <p class="smsbox__lead" data-i18n="smsLead"></p>
+      <div class="smsbox__grid" data-sms></div>
+      <p class="smsbox__hint" data-i18n="smsHint"></p>
+    </div>
+    <p class="help__note" data-i18n="helpNote"></p>
+    <p class="help__disc" data-i18n="helpDisclaimer"></p>
+    <button class="btn btn--sub" data-home data-i18n="helpBack"></button>
+  </section>
+
   <!-- ============ 検査モードの結果 ============ -->
   <section class="screen screen--result" id="screen-result" hidden>
     <p class="result__over" data-i18n="resultOver"></p>
@@ -177,6 +222,8 @@
     <div class="result__missed" id="result-missed"></div>
     <button class="btn btn--go" id="btn-retry" data-i18n="retry"></button>
     <button class="btn btn--sub" id="btn-to-design" data-i18n="toDesign"></button>
+    <button class="btn btn--sub" data-home data-i18n="toTop"></button>
+    <p class="help-entry"><button class="help-entry__btn" data-help data-i18n="helpLink"></button></p>
   </section>
 
   <!-- ============ 設計モードの結果 ============ -->
@@ -194,6 +241,8 @@
     </div>
     <button class="btn btn--go" id="cr-retry" data-i18n="retryCase"></button>
     <button class="btn btn--sub" id="btn-to-detect" data-i18n="toDetect"></button>
+    <button class="btn btn--sub" data-home data-i18n="toTop"></button>
+    <p class="help-entry"><button class="help-entry__btn" data-help data-i18n="helpLink"></button></p>
   </section>
 
 </div>

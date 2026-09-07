@@ -49,14 +49,15 @@
   function kase(i)  { return tr(C[i], (window.CASES_EN  || {})[C[i].no]); }
 
   var $ = function (id) { return document.getElementById(id); };
-  var screens = ['title', 'stage', 'case', 'result', 'cresult'];
+  var screens = ['title', 'stage', 'case', 'result', 'cresult', 'help'];
 
   function show(name) {
     screens.forEach(function (s) {
       var node = $(s === 'title' ? 'screen-title' :
                   s === 'stage' ? 'screen-stage' :
                   s === 'case' ? 'screen-case' :
-                  s === 'result' ? 'screen-result' : 'screen-cresult');
+                  s === 'result' ? 'screen-result' :
+                  s === 'help' ? 'screen-help' : 'screen-cresult');
       node.hidden = (s !== name);
     });
     window.scrollTo(0, 0);
@@ -77,7 +78,7 @@
   /* ===========================================================
      検査モード
      =========================================================== */
-  var D = { i: 0, results: [], picked: [], cleanup: null };
+  var D = { i: 0, results: [], picked: [], done: false, cleanup: null };
 
   var el = {
     progress: $('progress'), count: $('bar-count'), score: $('bar-score'),
@@ -113,7 +114,10 @@
     el.title.textContent = st.title;
     el.url.textContent = st.url;
     el.specimen.classList.remove('is-marked');
+    el.specimen.classList.toggle('is-tall', !!st.tall);
+    $('scroll-hint').hidden = !st.tall;
     el.mock.innerHTML = st.mock;
+    el.mock.scrollTop = 0;
 
     if (typeof st.onMount === 'function') D.cleanup = st.onMount(el.mock, st) || null;
 
@@ -158,6 +162,7 @@
     });
 
     el.specimen.classList.add('is-marked');
+    if (st.tall) $('scroll-hint').hidden = true;   /* 開いたので案内は不要 */
     if (st.demo) { el.demoBtn.disabled = false; el.demoBtn.style.opacity = '1'; }
 
     var isClear = st.verdict === 'white';
@@ -197,6 +202,8 @@
 
   function dResult() {
     if (D.cleanup) { D.cleanup(); D.cleanup = null; }
+    D.done = true;
+    logDone();
     var sum = D.results.reduce(function (a, r) { return a + r.score; }, 0);
     var full = S.length * MAX;
     $('result-score').textContent = sum;
@@ -246,7 +253,7 @@
   /* ===========================================================
      設計モード
      =========================================================== */
-  var G = { i: 0, picks: [], pickedIdx: [], cv: 0, trust: 0 };
+  var G = { i: 0, picks: [], pickedIdx: [], done: false, cv: 0, trust: 0 };
 
   var ce = {
     progress: $('c-progress'), count: $('c-count'), score: $('c-score'),
@@ -361,6 +368,8 @@
   });
 
   function gResult() {
+    G.done = true;
+    logDone();
     $('cr-cv').textContent = sign(G.cv, '');
     $('cr-tr').textContent = sign(G.trust, '');
 
@@ -415,6 +424,49 @@
   })();
 
   /* ===========================================================
+     どこまで進んだかの記録
+     -----------------------------------------------------------
+     送るのは「モード」「離脱か完走か」「何枚目まで」「言語」だけ。
+     誰が来たかを示す情報は送っていない。
+     LOG_URL を空にすれば、この仕組みは丸ごと止まる。
+     =========================================================== */
+  var LOG_URL = '';   // ← Apps Script のデプロイURLをここに貼る
+
+  var logged = false;
+
+  function sendLog(kind) {
+    if (!LOG_URL || logged) return;
+
+    var mode = null, at = 0, of_ = 0;
+    if (!$('screen-stage').hidden || (!$('screen-result').hidden && D.picked.length)) {
+      mode = 'detect'; at = D.i + 1; of_ = S.length;
+    } else if (!$('screen-case').hidden || (!$('screen-cresult').hidden && G.pickedIdx.length)) {
+      mode = 'design'; at = G.i + 1; of_ = C.length;
+    }
+    if (!mode) return;                       /* 入口を見ただけなら送らない */
+    if (kind === 'done') at = of_;
+
+    logged = true;
+    var body = JSON.stringify({ mode: mode, kind: kind, at: at, of: of_, lang: LANG });
+    try {
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(LOG_URL, new Blob([body], { type: 'text/plain' }));
+      } else {
+        fetch(LOG_URL, { method: 'POST', body: body, keepalive: true, mode: 'no-cors' });
+      }
+    } catch (e) {}
+  }
+
+  /* 完走したとき */
+  function logDone() { logged = false; sendLog('done'); logged = true; }
+
+  /* ページを閉じる・タブを離れるとき */
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') sendLog('left');
+  });
+  window.addEventListener('pagehide', function () { sendLog('left'); });
+
+  /* ===========================================================
      文言の差し替えと言語の切り替え
      =========================================================== */
   function applyI18n() {
@@ -441,6 +493,54 @@
         '<a href="https://deceptive.design/types" target="_blank" rel="noopener">Deceptive Patterns</a>' +
         (parts[1] || '');
     }
+
+    if ($('resume-detect')) {
+      $('resume-detect').textContent = T('resumeHint');
+      $('resume-design').textContent = T('resumeHint');
+    }
+
+    /* 対処のページを組み直す */
+    var hb = $('help-body');
+    if (hb) {
+      hb.innerHTML = '';
+      T('helpSections').forEach(function (sec) {
+        var d = document.createElement('div');
+        d.className = 'hsec' + (sec.mark ? ' hsec--mark' : '');
+        var h = document.createElement('p');
+        h.className = 'hsec__h';
+        h.textContent = sec.h;
+        d.appendChild(h);
+        var ul = document.createElement('ul');
+        sec.items.forEach(function (t) {
+          var li = document.createElement('li');
+          li.textContent = t;
+          ul.appendChild(li);
+        });
+        d.appendChild(ul);
+        hb.appendChild(d);
+      });
+    }
+
+    /* 実際に届くメッセージの見本を組み立てる */
+    document.querySelectorAll('[data-sms]').forEach(function (box) {
+      box.innerHTML = '';
+      T('smsItems').forEach(function (m) {
+        var d = document.createElement('button');
+        d.className = 'sms';
+        d.setAttribute('data-name', m.tell);
+        d.innerHTML =
+          '<span class="sms__head"><span class="sms__from">' + m.from + '</span>' +
+          '<span class="sms__time">' + m.time + '</span></span>' +
+          '<span class="sms__bubble">' + m.body +
+          '<span class="sms__link">' + m.link + '</span></span>';
+        d.addEventListener('click', function () {
+          var was = d.classList.contains('is-open');
+          box.querySelectorAll('.sms').forEach(function (o) { o.classList.remove('is-open'); });
+          if (!was) d.classList.add('is-open');
+        });
+        box.appendChild(d);
+      });
+    });
 
     var lb = $('btn-lang');
     lb.textContent = T('langSwitch');
@@ -483,18 +583,47 @@
      入口
      =========================================================== */
   function startDetect() {
-    D.i = 0; D.results = []; D.picked = [];
+    D.i = 0; D.results = []; D.picked = []; D.done = false;
     dRender(); show('stage');
   }
   function startDesign() {
-    G.i = 0; G.picks = []; G.pickedIdx = []; G.cv = 0; G.trust = 0;
+    G.i = 0; G.picks = []; G.pickedIdx = []; G.cv = 0; G.trust = 0; G.done = false;
     gRender(); show('case');
+  }
+
+  /* 途中で入口に戻っていた場合は、そこから続ける */
+  function enterDetect() {
+    if (!D.done && D.picked.length) { show('stage'); } else { startDetect(); }
+  }
+  function enterDesign() {
+    if (!G.done && G.pickedIdx.length) { show('case'); } else { startDesign(); }
+  }
+
+  /* 入口に戻ったとき、続きがあることを知らせる */
+  function markResume() {
+    var d = $('resume-detect'), g = $('resume-design');
+    d.hidden = !(!D.done && D.picked.length);
+    g.hidden = !(!G.done && G.pickedIdx.length);
+    d.textContent = T('resumeHint');
+    g.textContent = T('resumeHint');
+  }
+
+  function goHome() {
+    if (D.cleanup) { D.cleanup(); D.cleanup = null; }
+    markResume();
+    show('title');
   }
 
   Array.prototype.forEach.call(document.querySelectorAll('.mode'), function (b) {
     b.addEventListener('click', function () {
-      if (b.dataset.mode === 'detect') startDetect(); else startDesign();
+      if (b.dataset.mode === 'detect') enterDetect(); else enterDesign();
     });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.exit__btn, [data-home]'), function (b) {
+    b.addEventListener('click', goHome);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-help]'), function (b) {
+    b.addEventListener('click', function () { show('help'); });
   });
 
   $('btn-retry').addEventListener('click', startDetect);

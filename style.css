@@ -592,6 +592,8 @@ body{
 .modes{display:grid;gap:12px;margin:0 0 26px}
 @media(min-width:640px){.modes{grid-template-columns:1fr 1fr}}
 
+/* 押せることが分かる形にする。
+   押しどころの分かりにくい設計を批判している以上、ここは筋を通す */
 .mode{
   display:flex;
   flex-direction:column;
@@ -600,16 +602,43 @@ body{
   padding:22px 20px 18px;
   text-align:left;
   background:var(--white);
-  border:1px solid var(--line);
-  border-radius:2px;
+  border:1px solid var(--ink);
+  border-radius:3px;
+  box-shadow:0 3px 0 var(--ink);
   font:inherit;
   color:var(--ink);
   cursor:pointer;
-  transition:border-color .12s,transform .12s;
+  transition:transform .1s,box-shadow .1s,background .12s;
 }
-.mode:hover{border-color:var(--ink)}
-.mode:active{transform:translateY(1px)}
+.mode:hover{background:var(--paper-2)}
+.mode:active{transform:translateY(3px);box-shadow:0 0 0 var(--ink)}
 .mode:focus-visible{outline:2px solid var(--signal);outline-offset:3px}
+
+.mode__foot{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  width:100%;
+  margin-top:auto;   /* 高さが違っても押す場所は揃える */
+  padding-top:12px;
+  border-top:1px solid var(--line-2);
+}
+.mode__go{
+  flex:none;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:8px 16px;
+  background:var(--ink);
+  color:var(--paper-2);
+  font-size:.84rem;
+  font-weight:700;
+  letter-spacing:.04em;
+  border-radius:2px;
+}
+.mode__go::after{content:'→';font-size:.9rem;line-height:1}
+.mode:hover .mode__go{background:#0E1B24}
 
 .mode__tag{
   padding:2px 9px;
@@ -624,7 +653,6 @@ body{
 .mode__h{font-size:1.14rem;font-weight:900;line-height:1.4}
 .mode__t{font-size:.85rem;line-height:1.75;color:#3B424C}
 .mode__meta{
-  margin-top:4px;
   font-family:"Roboto Mono",monospace;
   font-size:.68rem;
   color:var(--ink-3);
@@ -1008,3 +1036,342 @@ body{
 /* 英語では和文用の詰めを解除する */
 html[lang="en"] body{font-feature-settings:normal}
 html[lang="en"] .title__h{letter-spacing:-.015em}
+
+/* ---- 入口へ戻る ----
+   このサイトが批判している手法を出口に使わないため、
+   本文と同じ濃さで、独立した行に置いている */
+.exit{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+.exit__btn{
+  padding:7px 14px;
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:2px;
+  font:inherit;
+  font-size:.84rem;
+  font-weight:700;
+  color:var(--ink);
+  cursor:pointer;
+  transition:border-color .12s,background .12s;
+}
+.exit__btn{font-size:.8rem}
+.exit__btn:hover{border-color:var(--ink);background:var(--paper-2)}
+.exit__btn:focus-visible{outline:2px solid var(--signal);outline-offset:3px}
+.exit__note{font-size:.74rem;color:var(--ink-2)}
+
+.mode__resume{
+  margin-top:6px;
+  padding:2px 9px;
+  background:var(--clear-bg);
+  color:var(--clear);
+  font-size:.68rem;
+  font-weight:700;
+  border-radius:1px;
+}
+
+/* ===========================================================
+   引っかかってしまったときに
+   =========================================================== */
+.help-entry{margin:26px 0 0;text-align:center}
+.help-entry__btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:11px 20px;
+  background:var(--white);
+  border:1px solid var(--line);
+  border-left:3px solid var(--signal);
+  border-radius:2px;
+  font:inherit;
+  font-size:.84rem;
+  font-weight:700;
+  color:var(--ink);
+  cursor:pointer;
+  transition:border-color .12s,background .12s;
+}
+.help-entry__btn::before{
+  content:'';
+  width:7px; height:7px;
+  flex:none;
+  border-radius:50%;
+  background:var(--signal);
+}
+.help-entry__btn:hover{border-color:var(--ink);border-left-color:var(--signal);background:var(--paper-2)}
+.help-entry__btn:focus-visible{outline:2px solid var(--signal);outline-offset:3px}
+
+.help__h{
+  margin:0 0 26px;
+  font-size:clamp(1.7rem,6vw,2.5rem);
+  font-weight:900;
+  line-height:1.35;
+}
+.help__lead{
+  margin:0 0 34px;
+  max-width:36em;
+  font-size:.95rem;
+  color:#2E3A44;
+}
+
+.hsec{
+  padding:20px 22px;
+  margin-bottom:12px;
+  background:var(--white);
+  border:1px solid var(--line);
+}
+.hsec--mark{border-left:3px solid var(--signal);background:var(--signal-bg)}
+.hsec__h{
+  margin:0 0 12px;
+  font-size:.92rem;
+  font-weight:900;
+  letter-spacing:.02em;
+}
+.hsec ul{margin:0;padding-left:1.15em}
+.hsec li{font-size:.88rem;line-height:1.85;margin-bottom:7px;color:#2E3A44}
+.hsec li:last-child{margin-bottom:0}
+.hsec li::marker{color:var(--ink-3)}
+.hsec--mark li:first-child{
+  font-size:1.06rem;
+  font-weight:900;
+  color:var(--signal);
+  list-style:none;
+  margin-left:-1.15em;
+  margin-bottom:12px;
+}
+
+.help__note{
+  margin:26px 0 0;
+  padding:16px 18px;
+  background:var(--paper-2);
+  border-left:3px solid var(--ink);
+  font-size:.9rem;
+  line-height:1.85;
+}
+.help__disc{
+  margin:20px 0 30px;
+  font-size:.76rem;
+  line-height:1.85;
+  color:var(--ink-2);
+}
+
+@media(max-width:520px){
+  .hsec{padding:17px 17px}
+}
+
+/* ===========================================================
+   長い検体（枠の中をスクロールさせる）
+   実物のダークパターンは画面の外にあるから機能する
+   =========================================================== */
+.specimen{position:relative}
+.specimen.is-tall .specimen__view{
+  max-height:430px;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.specimen.is-tall::after{
+  content:'';
+  position:absolute;
+  left:1px; right:1px; bottom:1px;
+  height:52px;
+  background:linear-gradient(to bottom,rgba(252,253,253,0),rgba(252,253,253,.96));
+  pointer-events:none;
+}
+.specimen.is-tall.is-marked::after{display:none}
+
+.scroll-hint{
+  margin:-14px 0 20px;
+  font-size:.72rem;
+  color:var(--ink-3);
+  text-align:right;
+}
+
+/* ---- 検体2 ランディングページ ---- */
+.m-lp{margin:-22px;font-size:.86rem}
+.m-lp__nav{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid #EDEDED}
+.m-lp__logo{font-size:.94rem;font-weight:900;color:#148540}
+.m-lp__navlinks{font-size:.66rem;color:#999}
+.m-lp__hero{padding:26px 20px;text-align:center;background:linear-gradient(180deg,#F3FBF6,#fff)}
+.m-lp__eyebrow{margin:0 0 8px;font-size:.64rem;letter-spacing:.1em;color:#5C9E77}
+.m-lp__h{margin:0 0 8px;font-size:1.24rem;font-weight:900;line-height:1.45;color:#1A1A1A}
+.m-lp__sub{margin:0 0 18px;font-size:.78rem;color:#666}
+.m-lp__cta{display:block;width:100%;max-width:300px;margin:0 auto;padding:18px;background:#1DB954;color:#fff;font-size:1.1rem;font-weight:900;border-radius:6px;box-shadow:0 3px 0 #148540}
+.m-lp__cta--again{margin:22px auto;max-width:300px}
+.m-lp__ctasub{margin:9px 0 0;font-size:.66rem;color:#8A8A8A}
+.m-lp__stats{display:flex;justify-content:center;gap:26px;padding:14px 16px;background:#FAFAFA;border-top:1px solid #EEE;border-bottom:1px solid #EEE;font-size:.64rem;color:#888}
+.m-lp__stats b{display:block;font-size:1.1rem;color:#222;font-weight:900}
+.m-lp__sec{padding:20px 20px 4px}
+.m-lp__sech{margin:0 0 12px;font-size:.74rem;font-weight:900;color:#444;letter-spacing:.06em}
+.m-lp__feat{margin-bottom:11px;font-size:.76rem;color:#666;line-height:1.7}
+.m-lp__feat b{display:block;font-size:.84rem;color:#222}
+.m-lp__voice{margin:0 0 10px;padding:11px 13px;background:#FAFAFA;border-radius:4px;font-size:.74rem;color:#555;line-height:1.75}
+.m-lp__voice span{display:block;margin-top:4px;font-size:.62rem;color:#AAA}
+.m-lp__faq{margin:0 0 10px;font-size:.74rem;color:#666;line-height:1.75}
+.m-lp__faq b{display:block;font-size:.78rem;color:#222}
+.m-lp__foot{padding:16px 20px 18px;background:#F5F5F5;border-top:1px solid #EAEAEA}
+.m-lp__footlinks{margin:0 0 10px;font-size:.62rem;color:#999;line-height:1.9}
+.m-lp__fine{margin:0 0 10px;font-size:.56rem;color:#C4C4C4;line-height:1.65}
+.m-lp__copy{margin:0;font-size:.6rem;color:#BBB}
+
+/* ---- 検体5 プラン選択 ---- */
+.m-plan2{margin:-22px;font-size:.86rem}
+.m-plan2 .m-lp__logo{color:#E01B24}
+.m-plan2__body{padding:22px 20px}
+.m-plan2__step{margin:0 0 6px;font-size:.66rem;color:#999;text-align:center}
+.m-plan2__h{margin:0 0 18px;font-size:1.08rem;font-weight:900;text-align:center;color:#1A1A1A}
+.m-plan2__card{position:relative;padding:22px 18px 18px;border:2px solid #E01B24;border-radius:8px;background:#fff}
+.m-plan2__badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);margin:0;padding:2px 13px;background:#E01B24;color:#fff;font-size:.62rem;font-weight:900;border-radius:10px}
+.m-plan2__name{margin:0 0 4px;font-size:.9rem;font-weight:900;text-align:center;color:#E01B24}
+.m-plan2__price{margin:0 0 14px;font-size:.72rem;text-align:center;color:#555}
+.m-plan2__price b{font-size:1.7rem;font-weight:900;color:#1A1A1A}
+.m-plan2__list{margin:0 0 16px;padding-left:1.1em}
+.m-plan2__list li{font-size:.74rem;color:#555;line-height:1.9}
+.m-plan2__list li::marker{color:#E01B24}
+.m-plan2__paid{display:block;width:100%;padding:17px;background:#E01B24;color:#fff;font-size:1.06rem;font-weight:900;border-radius:6px;box-shadow:0 3px 0 #A5121A}
+.m-plan2__note{margin:9px 0 0;font-size:.64rem;color:#999;text-align:center}
+.m-plan2__row{margin-top:22px;text-align:right}
+.m-plan2__ghost{font-size:.64rem;color:#E2E2E2;cursor:pointer}
+
+/* 回答すると枠が開き、ページ全体と印が一度に見える */
+.specimen.is-tall.is-marked .specimen__view{
+  max-height:none;
+  overflow:visible;
+  padding-top:22px;
+}
+
+/* ===========================================================
+   詐欺側の検体
+   =========================================================== */
+
+/* ---- 4 偽の警告 ---- */
+.m-scare{margin:-22px;position:relative;min-height:290px;background:#fff}
+.m-scare__page{padding:18px 20px;filter:blur(1.5px);opacity:.5}
+.m-scare__ptitle{margin:0 0 8px;font-size:.94rem;font-weight:700}
+.m-scare__ptext{margin:0;font-size:.76rem;color:#777;line-height:1.9}
+.m-scare__modal{position:absolute;left:14px;right:14px;top:36px;border-radius:6px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.32)}
+.m-scare__bar{padding:9px 14px;background:#C0261A;color:#fff;font-size:.82rem;font-weight:900;letter-spacing:.04em}
+.m-scare__body{padding:16px 18px 18px;background:#fff}
+.m-scare__h{margin:0 0 10px;font-size:.94rem;font-weight:700;color:#1A1A1A}
+.m-scare__h b{color:#C0261A;font-size:1.12rem}
+.m-scare__list{margin:0 0 12px;padding-left:1.1em}
+.m-scare__list li{font-family:"Roboto Mono",monospace;font-size:.66rem;color:#8A8A8A;line-height:1.9}
+.m-scare__timer{margin:0 0 12px;font-size:.76rem;color:#C0261A;font-weight:700}
+.m-scare__timer b{font-family:"Roboto Mono",monospace;font-size:1.05rem}
+.m-scare__cta{display:block;width:100%;padding:15px;background:#C0261A;color:#fff;font-size:1rem;font-weight:900;border-radius:5px}
+.m-scare__tel{margin:11px 0 0;font-size:.72rem;color:#0A66C2;text-align:center;text-decoration:underline}
+
+/* ---- 10 不在通知のSMS ---- */
+.m-sms{margin:-22px;padding:16px 14px;background:#EDEEF2;min-height:230px}
+.m-sms__head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px}
+.m-sms__from{font-family:"Roboto Mono",monospace;font-size:.72rem;color:#5A6070}
+.m-sms__time{font-size:.62rem;color:#A2A7B3}
+.m-sms__bubble{max-width:82%;padding:12px 14px;background:#fff;border-radius:14px 14px 14px 3px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.m-sms__bubble p{margin:0 0 7px;font-size:.78rem;line-height:1.8;color:#222}
+.m-sms__link{color:#0A66C2;text-decoration:underline;word-break:break-all}
+.m-sms__sign{margin:0 !important;font-size:.68rem !important;color:#C0261A !important}
+.m-sms__prev{margin-top:14px;opacity:.45}
+.m-sms__old{margin:0;max-width:82%;padding:10px 13px;background:#fff;border-radius:14px 14px 14px 3px;font-size:.72rem;color:#666}
+
+/* ---- 16 偽のログイン ---- */
+.m-phish{margin:-22px;background:#fff}
+.m-phish__urlbar{display:flex;align-items:center;gap:7px;padding:9px 13px;background:#F1F3F4;border-bottom:1px solid #E3E5E7;font-family:"Roboto Mono",monospace;font-size:.68rem;color:#3C4043;word-break:break-all}
+.m-phish__lock{flex:none;font-size:.62rem}
+.m-phish__body{padding:24px 22px;text-align:center}
+.m-phish__logo{margin:0 0 16px;font-size:1.2rem;font-weight:900;color:#1A73E8;letter-spacing:-.01em}
+.m-phish__lead{margin:0 0 12px;font-size:.8rem;color:#555}
+.m-phish__file{margin:0 0 18px;padding:9px 12px;background:#F6F8FA;border:1px solid #E6E8EB;border-radius:4px;font-size:.76rem;color:#333}
+.m-phish__in{display:block;width:100%;margin-bottom:9px;padding:11px 13px;border:1px solid #DADCE0;border-radius:4px;font:inherit;font-size:.8rem;background:#fff}
+.m-phish__cta{display:block;width:100%;margin-top:5px;padding:13px;background:#1A73E8;color:#fff;font-size:.9rem;font-weight:700;border-radius:4px}
+.m-phish__or{margin:12px 0;font-size:.68rem;color:#AAA}
+.m-phish__sso{display:block;width:100%;padding:12px;background:#fff;border:1px solid #DADCE0;border-radius:4px;font:inherit;font-size:.82rem;color:#3C4043;font-weight:700}
+.m-phish__foot{margin:18px 0 0;font-size:.62rem;color:#BBB}
+
+/* ---- 21 偽の更新 ---- */
+.m-fakeup{margin:-22px;position:relative;min-height:250px;background:#111}
+.m-fakeup__page{display:flex;align-items:center;justify-content:center;height:250px}
+.m-fakeup__ptitle{margin:0;font-size:.78rem;color:#5A5A5A}
+.m-fakeup__dialog{position:absolute;left:50%;top:34px;transform:translateX(-50%);width:min(320px,84%);padding:20px 20px 16px;background:#F2F2F4;border-radius:12px;box-shadow:0 14px 44px rgba(0,0,0,.5)}
+.m-fakeup__h{margin:0 0 8px;font-size:.94rem;font-weight:900;text-align:center;color:#1A1A1A}
+.m-fakeup__t{margin:0 0 12px;font-size:.74rem;line-height:1.75;color:#555;text-align:center}
+.m-fakeup__meta{margin-bottom:14px;padding:7px 10px;background:#E6E6EA;border-radius:4px;font-family:"Roboto Mono",monospace;font-size:.62rem;color:#8A8A90;text-align:center}
+.m-fakeup__btns{display:flex;gap:8px}
+.m-fakeup__later,.m-fakeup__now{flex:1;padding:11px 0;font:inherit;font-size:.82rem;font-weight:700;border-radius:6px}
+.m-fakeup__later{background:#DCDCE0;color:#555}
+.m-fakeup__now{background:#0A84FF;color:#fff}
+
+/* 詐欺側の検体で、印のラベルが本文に重なる箇所の調整 */
+.specimen.is-marked .m-sms__link{display:inline-block;margin-top:18px}
+.specimen.is-marked .m-scare__tel{margin-top:22px}
+.specimen.is-marked .m-fakeup__meta{margin-top:20px}
+.specimen.is-marked .m-phish__lead{margin-top:20px}
+
+/* ===========================================================
+   実際に届くメッセージの見本（すべて架空）
+   =========================================================== */
+.smsbox{margin:30px 0 0;padding:22px 24px;background:var(--white);border:1px solid var(--line);border-left:3px solid var(--signal)}
+.smsbox--help{margin:26px 0 0}
+.smsbox__h{margin:0 0 8px;font-size:.8rem;font-weight:700;letter-spacing:.1em;color:var(--signal)}
+.smsbox__lead{margin:0 0 18px;font-size:.84rem;line-height:1.9;color:#2E3A44}
+.smsbox__grid{display:grid;gap:12px}
+@media(min-width:640px){.smsbox__grid{grid-template-columns:1fr 1fr}}
+.smsbox__hint{margin:14px 0 0;font-size:.72rem;color:var(--ink-3);text-align:right}
+
+.sms{
+  position:relative;
+  display:block;
+  width:100%;
+  padding:12px 13px 34px;   /* 下は見分けどころの置き場 */
+  text-align:left;
+  background:#EDEEF2;
+  border:none;
+  border-radius:6px;
+  font:inherit;
+  cursor:pointer;
+  transition:box-shadow .14s;
+}
+.sms:hover{box-shadow:0 3px 12px rgba(28,35,43,.14)}
+.sms:focus-visible{outline:2px solid var(--signal);outline-offset:3px}
+.sms__head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px}
+.sms__from{font-family:"Roboto Mono",monospace;font-size:.66rem;color:#5A6070}
+.sms__time{font-size:.6rem;color:#A2A7B3}
+.sms__bubble{
+  display:block;
+  padding:11px 13px;
+  background:#fff;
+  border-radius:12px 12px 12px 3px;
+  font-size:.76rem;
+  line-height:1.8;
+  color:#222;
+}
+.sms__link{display:block;margin-top:5px;color:#0A66C2;text-decoration:underline;word-break:break-all;font-size:.72rem}
+
+/* 触れると見分けどころが出る */
+.sms::after{
+  content:attr(data-name);
+  position:absolute;
+  right:11px;
+  bottom:9px;
+  transform:scale(.92);
+  z-index:5;
+  padding:3px 10px;
+  background:var(--ink);
+  color:var(--paper-2);
+  font-size:.66rem;
+  font-weight:700;
+  white-space:nowrap;
+  border-radius:2px;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .16s,transform .16s;
+}
+.sms.is-open::after{opacity:1;transform:scale(1)}
+.sms.is-open{box-shadow:0 3px 14px rgba(28,35,43,.2)}
+.sms.is-open .sms__link{background:var(--signal-bg);outline:2px solid var(--signal);outline-offset:2px;border-radius:2px}
+
+@media(max-width:520px){
+  .smsbox{padding:18px 18px}
+  .sms::after{font-size:.6rem;max-width:70vw;overflow:hidden;text-overflow:ellipsis}
+}

@@ -10,7 +10,7 @@
 ├── app.js          2モードの進行・採点・言語切替
 └── data/
     ├── i18n.js     UI文言の日英辞書
-    ├── stages.js   検査モードの問題（20件・日本語が原本）
+    ├── stages.js   検査モードの問題（24件・日本語が原本）
     ├── stages.en.js 検体の英語版（no をキーに上書き）
     ├── cases.js    設計モードの問題（8件・日本語が原本）
     └── cases.en.js ケースの英語版（no をキーに上書き）
@@ -170,7 +170,7 @@ UIの文言は `data/i18n.js` に足し、HTML側で `data-i18n="キー"` を付
 ```bash
 git init
 git add .
-git commit -m "初期リリース：検査20件 / 設計8件 / 日英対応"
+git commit -m "初期リリース：検査24件 / 設計8件 / 日英対応"
 git remote add origin git@github.com:USER/REPO.git
 git push -u origin main
 ```
@@ -180,6 +180,33 @@ Vercelでリポジトリを選び、フレームワークは「Other」、ビル
 
 サーバー処理も保存領域もないため、改ざんの経路は実質リポジトリだけ。
 2要素認証をかけておけば十分。
+
+---
+
+## どこまで進んだかの記録（任意）
+
+`app.js` の `LOG_URL` に Google Apps Script のURLを入れると、
+「どのモードを」「離脱か完走か」「何枚目まで進んだか」「言語」だけが記録される。
+空のままなら、この仕組みは丸ごと動かない。
+
+設置の手順は `gas-log.js` の先頭に書いてある。要点だけ挙げると、
+
+1. スプレッドシートを作り、拡張機能 → Apps Script に `gas-log.js` を貼る
+2. ウェブアプリとしてデプロイ（実行：自分／アクセス：全員）
+3. 出てきた `.../exec` のURLを `app.js` の `LOG_URL` に貼る
+
+Apps Script 側で `集計する()` を実行すると、「集計」シートに
+検体ごとの離脱数と残存率が出る。どこで人が減るかはここで見る。
+
+### 送っていないもの
+
+IPアドレス、UA、Cookie、識別子、回答の内容、点数。
+Apps Script は仕様上 IP を取得できないため、構造的に個人が特定できない。
+送信は1セッションにつき1回だけで、入口を見ただけでは送らない。
+
+`doGet` を実装していないので、URLをブラウザで開いても中身は見えない。
+ただし `LOG_URL` 自体はソースに書かれるため隠せない。
+偽のデータを送られる可能性はあるが、Apps Script 側で範囲チェックをしている。
 
 ---
 
@@ -195,6 +222,12 @@ Vercelでリポジトリを選び、フレームワークは「Other」、ビル
    Fake social proof / Fake urgency / Nagging / Confirmshaming / Fake scarcity /
    Disguised ads / Comparison prevention / Addictive Design / Currency Confusion）
   Roach Motel や Bait and Switch のような古い呼称は、解説の中で触れるだけにする。
+- 詐欺側の検体（category: '詐欺の手口'）は、この18分類の外側にある。
+  Scareware / Phishing / Credential harvesting / Fake update のように、
+  一般に通用する名称を使う。ダークパターンと詐欺は地続きだが別物なので、
+  同じ分類に押し込めない。
+- 詐欺側で実在する企業・サービス・電話番号・ドメインは使わない。
+  ドメインは .example を、電話番号は 0120-000-000 のような明らかな架空値を使う。
 - 設計モードでは、ダークな選択を倫理ではなく**事業の損得**で否定する。
   説教にすると、実際に数字を求められている人には届かない。
 
