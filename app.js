@@ -69,6 +69,18 @@
   function bring(node) {
     node.scrollIntoView({ behavior: smooth() ? 'smooth' : 'auto', block: 'start' });
   }
+  /* 選択肢の並びを毎回変える。正解の位置が固定だと、内容を見ずに当てられてしまう。
+     一度決めた並びは記憶しておき、言語を切り替えても崩れないようにする */
+  function shuffled(n) {
+    var a = [];
+    for (var i = 0; i < n; i++) a.push(i);
+    for (var j = a.length - 1; j > 0; j--) {
+      var k = Math.floor(Math.random() * (j + 1));
+      var t = a[j]; a[j] = a[k]; a[k] = t;
+    }
+    return a;
+  }
+
   function sign(n, unit) {
     unit = unit || '%';
     if (n === 0) return '±0' + unit;
@@ -78,7 +90,7 @@
   /* ===========================================================
      検査モード
      =========================================================== */
-  var D = { i: 0, results: [], picked: [], done: false, cleanup: null };
+  var D = { i: 0, results: [], picked: [], order: [], done: false, cleanup: null };
 
   var el = {
     progress: $('progress'), count: $('bar-count'), score: $('bar-score'),
@@ -133,11 +145,13 @@
 
     el.question.textContent = st.question;
     el.choices.innerHTML = '';
-    st.choices.forEach(function (c, n) {
+    if (!D.order[D.i]) D.order[D.i] = shuffled(st.choices.length);
+    D.order[D.i].forEach(function (orig, pos) {
+      var c = st.choices[orig];
       var b = document.createElement('button');
       b.className = 'choice';
-      b.innerHTML = '<span class="choice__k">' + 'ABC'[n] + '</span><span>' + c.text + '</span>';
-      b.addEventListener('click', function () { dAnswer(n); });
+      b.innerHTML = '<span class="choice__k">' + 'ABCD'[pos] + '</span><span>' + c.text + '</span>';
+      b.addEventListener('click', function () { dAnswer(orig); });
       el.choices.appendChild(b);
     });
     el.reveal.hidden = true;
@@ -155,10 +169,11 @@
       score: picked.score, pattern: st.patternName
     };
 
-    Array.prototype.forEach.call(el.choices.children, function (b, k) {
+    var ord = D.order[D.i];
+    Array.prototype.forEach.call(el.choices.children, function (b, pos) {
       b.disabled = true;
-      if (k === n) b.classList.add('is-picked');
-      if (k === best) b.classList.add('is-best');
+      if (ord[pos] === n) b.classList.add('is-picked');
+      if (ord[pos] === best) b.classList.add('is-best');
     });
 
     el.specimen.classList.add('is-marked');
@@ -253,7 +268,7 @@
   /* ===========================================================
      設計モード
      =========================================================== */
-  var G = { i: 0, picks: [], pickedIdx: [], done: false, cv: 0, trust: 0 };
+  var G = { i: 0, picks: [], pickedIdx: [], order: [], done: false, cv: 0, trust: 0 };
 
   var ce = {
     progress: $('c-progress'), count: $('c-count'), score: $('c-score'),
@@ -291,11 +306,13 @@
     ce.question.textContent = cs.question;
 
     ce.choices.innerHTML = '';
-    cs.options.forEach(function (o, n) {
+    if (!G.order[G.i]) G.order[G.i] = shuffled(cs.options.length);
+    G.order[G.i].forEach(function (orig, pos) {
+      var o = cs.options[orig];
       var b = document.createElement('button');
       b.className = 'choice';
-      b.innerHTML = '<span class="choice__k">' + 'ABC'[n] + '</span><span>' + o.text + '</span>';
-      b.addEventListener('click', function () { gPick(n); });
+      b.innerHTML = '<span class="choice__k">' + 'ABCD'[pos] + '</span><span>' + o.text + '</span>';
+      b.addEventListener('click', function () { gPick(orig); });
       ce.choices.appendChild(b);
     });
 
@@ -316,9 +333,10 @@
     G.cv += o.now.cv;
     G.trust += o.now.trust;
 
-    Array.prototype.forEach.call(ce.choices.children, function (b, k) {
+    var gord = G.order[G.i];
+    Array.prototype.forEach.call(ce.choices.children, function (b, pos) {
       b.disabled = true;
-      if (k === n) b.classList.add('is-picked');
+      if (gord[pos] === n) b.classList.add('is-picked');
     });
 
     ce.cvLab.textContent = cs.metric;
@@ -600,11 +618,11 @@
      入口
      =========================================================== */
   function startDetect() {
-    D.i = 0; D.results = []; D.picked = []; D.done = false;
+    D.i = 0; D.results = []; D.picked = []; D.order = []; D.done = false;
     dRender(); show('stage');
   }
   function startDesign() {
-    G.i = 0; G.picks = []; G.pickedIdx = []; G.cv = 0; G.trust = 0; G.done = false;
+    G.i = 0; G.picks = []; G.pickedIdx = []; G.order = []; G.cv = 0; G.trust = 0; G.done = false;
     gRender(); show('case');
   }
 

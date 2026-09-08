@@ -47,7 +47,7 @@ window.CASES_EN = {
       laterText: 'Nothing moved. Only the build time was spent.'
     }
   ],
-  lesson: 'Both the first and second options raise sign-ups. What differs is whether the gain survives into next month.'
+  lesson: 'Requiring a card and dropping the requirement both raise sign-ups. What differs is whether the gain survives into next month.'
 },
 
 2: {
@@ -139,7 +139,7 @@ window.CASES_EN = {
       laterText: 'It stayed within the margin of error.'
     }
   ],
-  lesson: 'Counted on sign-ups alone, the first option is the most successful thing you shipped this month.'
+  lesson: 'Counted on sign-ups alone, the pre-ticked box is the most successful thing you shipped this month.'
 },
 
 4: {
@@ -185,7 +185,7 @@ window.CASES_EN = {
       laterText: 'Barely moved.'
     }
   ],
-  lesson: 'The second and third options offer an identical discount. Only the way it is expressed differs.'
+  lesson: '“Two months free” and “17% off” are the very same discount. Only the way it is expressed differs.'
 },
 
 5: {
@@ -276,7 +276,7 @@ window.CASES_EN = {
       laterText: 'It stayed within the margin of error.'
     }
   ],
-  lesson: 'The first two options produce almost the same number this month. They part company from next month onward.'
+  lesson: 'Blocking the back button and stating a refund guarantee produce almost the same number this month. They part company from next month onward.'
 },
 
 7: {
